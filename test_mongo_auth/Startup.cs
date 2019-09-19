@@ -100,6 +100,9 @@ namespace test_mongo_auth
 
 
             services.AddSingleton<PostService>();
+            services.AddSingleton<AreaService>();
+            services.AddSingleton<AssetService>();
+            services.AddSingleton<RessourceTypeService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
