@@ -189,6 +189,7 @@ namespace test_mongo_auth
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc();
             CreateUserRoles(services).Wait();
         }
