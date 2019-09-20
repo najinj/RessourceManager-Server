@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using test_mongo_auth.Models.RessourceTypes;
@@ -42,10 +43,20 @@ namespace test_mongo_auth.Controllers
         }
 
         // POST: api/RessourceType
+        //  [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<RessourceType> Create(RessourceType ressourceType)
         {
-            _ressourceTypeService.Create(ressourceType);
+            try
+            {
+                _ressourceTypeService.Create(ressourceType);
+            }
+            catch(Exception ex)
+            {
+                ModelState.AddModelError("AreaTypeId", ex.Message);
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
 
             return CreatedAtRoute("GetPost", new { id = ressourceType.Id.ToString() }, ressourceType);
         }

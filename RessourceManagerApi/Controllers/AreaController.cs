@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using RessourceManagerApi.Exceptions;
 using test_mongo_auth.Models.Ressource;
 using test_mongo_auth.Services;
 
@@ -37,9 +41,25 @@ namespace test_mongo_auth.Controllers
         [HttpPost]
         public ActionResult<Area> Create(Area area)
         {
-            _areaService.Create(area);
-
-            return CreatedAtRoute("GetArea", new { id = area.Id.ToString() }, area);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var result = _areaService.Create(area);
+                }
+                catch (RessourceTypeNotFoundException e)
+                {
+                    ModelState.AddModelError("AreaTypeId", e.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+                return CreatedAtRoute("GetArea", new { id = area.Id.ToString() }, area);
+            }
+            else
+            {
+                string errorMessage = string.Join(", ", ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+          
         }
 
         [HttpPut("{id:length(24)}")]

@@ -1,23 +1,26 @@
 ﻿using MongoDB.Driver;
+using RessourceManagerApi.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using test_mongo_auth.Models;
 using test_mongo_auth.Models.Ressource;
+using test_mongo_auth.Models.RessourceTypes;
 
 namespace test_mongo_auth.Services
 {
     public class AssetService
     {
         private readonly IMongoCollection<Asset> _assets;
-
+        private readonly IMongoCollection<RessourceType> _ressourceTypes;
         public AssetService(IBookstoreDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
 
             _assets = database.GetCollection<Asset>(settings.AssetsCollectionName);
+            _ressourceTypes = database.GetCollection<RessourceType>(settings.RessourceTypesCollectionName);
         }
 
         public List<Asset> Get() =>
@@ -28,6 +31,9 @@ namespace test_mongo_auth.Services
 
         public Asset Create(Asset asset)
         {
+            var ressourceType = _ressourceTypes.Find<RessourceType>(resourceType => resourceType.Id == asset.AreaTypeId).FirstOrDefault();
+            if (ressourceType == null)
+                throw new RessourceTypeNotFoundException("Can't find Ressource Type");
             _assets.InsertOne(asset);
             return asset;
         }

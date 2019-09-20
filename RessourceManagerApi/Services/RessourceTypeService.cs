@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using RessourceManagerApi.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,15 @@ namespace test_mongo_auth.Services
 
         public RessourceType Create(RessourceType ressourceType)
         {
-            _ressourceTypes.InsertOne(ressourceType);
+            try
+            {
+                _ressourceTypes.InsertOne(ressourceType);
+
+            }
+            catch (MongoDuplicateKeyException ex)
+            {
+                throw new RessourceTypeDuplicateKeyException(ex.Message);
+            }
             return ressourceType;
         }
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -6,21 +8,29 @@ using System.IdentityModel.Tokens.Jwt;
 
 using System.Security.Claims;
 using System.Text;
-
+using System.Threading.Tasks;
 using test_mongo_auth.Models;
 
 namespace test_mongo_auth.Helpers
 {
     public static class AuthenticationHelper
     {
-        public static string GenerateJwtToken(string email, ApplicationUser user, IConfiguration configuration)
+        public async static Task<string> GenerateJwtToken(string email, ApplicationUser user, IConfiguration configuration , UserManager<ApplicationUser> userManager)
         {
+            var userRoles = await userManager.GetRolesAsync(user);
+            
+
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
+
+            foreach (var userRole in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole));    
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

@@ -74,7 +74,7 @@ namespace test_mongo_auth.Controllers
                 {
                     
                     await _signInManager.SignInAsync(user, false);
-                    var token = AuthenticationHelper.GenerateJwtToken(model.Email, user, _configuration);
+                    var token = await AuthenticationHelper.GenerateJwtToken(model.Email, user, _configuration, _userManager);
 
                     var rootData = new SignUpResponse(token, user.UserName, user.Email);
                     return Created("api/authentication/register", rootData);
@@ -96,7 +96,7 @@ namespace test_mongo_auth.Controllers
                 if (result.Succeeded)
                 {
                     var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
-                    var token = AuthenticationHelper.GenerateJwtToken(model.Email, appUser, _configuration);
+                    var token = await AuthenticationHelper.GenerateJwtToken(model.Email, appUser, _configuration, _userManager);
 
                     var rootData = new LoginResponse(token, appUser.UserName, appUser.Email);
                     return Ok(rootData);
