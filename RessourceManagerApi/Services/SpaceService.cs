@@ -1,7 +1,6 @@
 ﻿using MongoDB.Driver;
-using RessourceManagerApi.Exceptions.Asset;
 using RessourceManagerApi.Exceptions.RessourceType;
-using System;
+using RessourceManagerApi.Exceptions.Space;
 using System.Collections.Generic;
 using System.Linq;
 using test_mongo_auth.Models;
@@ -10,54 +9,52 @@ using test_mongo_auth.Models.RessourceTypes;
 
 namespace test_mongo_auth.Services
 {
-    public class AssetService
+    public class SpaceService
     {
+        private readonly IMongoCollection<Space> _spaces;
         private readonly IMongoCollection<Asset> _assets;
         private readonly IMongoCollection<RessourceType> _ressourceTypes;
-        public AssetService(IRessourceDatabaseSettings settings)
+        public SpaceService(IRessourceDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
 
+            _spaces = database.GetCollection<Space>(settings.SpacesCollectionName);
             _assets = database.GetCollection<Asset>(settings.AssetsCollectionName);
             _ressourceTypes = database.GetCollection<RessourceType>(settings.RessourceTypesCollectionName);
         }
 
-        public List<Asset> Get() =>
-            _assets.Find(asset => true).ToList();
+        public List<Space> Get() =>
+            _spaces.Find(space => true).ToList();
 
-        public Asset Get(string id) =>
-            _assets.Find<Asset>(asset => asset.Id == id).FirstOrDefault();
+        public Space Get(string id) =>
+            _spaces.Find(space => space.Id == id).FirstOrDefault();
 
-        public Asset Create(Asset asset)
+        public Space Create(Space space)
         {
-            var ressourceType = _ressourceTypes.Find(resourceType => resourceType.Id == asset.AssetTypeId).FirstOrDefault();
+            var ressourceType = _ressourceTypes.Find(resourceType => resourceType.Id == space.SpaceTypeId).FirstOrDefault();
             if (ressourceType == null)
                 throw new RessourceTypeNotFoundException("Can't find Ressource Type");
             try
             {
-                _assets.InsertOne(asset);
+                _spaces.InsertOne(space);
 
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    throw new AssetDuplicateKeyException(ex.Message);
+                    throw new SpaceDuplicateKeyException(ex.Message);
             }
-            catch (Exception ex)
-            {               
-                throw new Exception();
-            }
-            return asset;
+            return space;
         }
 
-        public void Update(string id, Asset assetIn) =>
-            _assets.ReplaceOne(asset => asset.Id == id, assetIn);
+        public void Update(string id, Space spaceIn) =>
+            _spaces.ReplaceOne(space => space.Id == id, spaceIn);
 
-        public void Remove(Asset assetIn) =>
-            _assets.DeleteOne(asset => asset.Id == assetIn.Id);
+        public void Remove(Space spaceIn) =>
+            _spaces.DeleteOne(space => space.Id == spaceIn.Id);
 
         public void Remove(string id) =>
-            _assets.DeleteOne(asset => asset.Id == id);
+            _spaces.DeleteOne(space => space.Id == id);
     }
 }

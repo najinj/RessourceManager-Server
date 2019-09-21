@@ -81,8 +81,8 @@ namespace test_mongo_auth.Controllers
                 }
                 return Ok(string.Join(",", result.Errors?.Select(error => error.Description)));
             }
-            string errorMessage = string.Join(", ", ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
-            return BadRequest(errorMessage ?? "Bad Request");
+            
+            return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
         // api/user/login
@@ -96,15 +96,19 @@ namespace test_mongo_auth.Controllers
                 if (result.Succeeded)
                 {
                     var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
-                    var token = await AuthenticationHelper.GenerateJwtToken(model.Email, appUser, _configuration, _userManager);
+                    if (appUser.Activated)
+                    {
+                        var token = await AuthenticationHelper.GenerateJwtToken(model.Email, appUser, _configuration, _userManager);
 
-                    var rootData = new LoginResponse(token, appUser.UserName, appUser.Email);
-                    return Ok(rootData);
+                        var rootData = new LoginResponse(token, appUser.UserName, appUser.Email);
+                        return Ok(rootData);
+                    }
+                    ModelState.TryAddModelError("Activated", "Account is not Activated");
+                    return StatusCode((int)HttpStatusCode.Unauthorized, new ValidationProblemDetails(ModelState));
                 }
                 return StatusCode((int)HttpStatusCode.Unauthorized, "Bad Credentials");
             }
-            string errorMessage = string.Join(", ", ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
-            return BadRequest(errorMessage ?? "Bad Request");
+            return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
 

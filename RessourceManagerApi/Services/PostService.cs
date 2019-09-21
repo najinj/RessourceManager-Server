@@ -11,7 +11,7 @@ namespace test_mongo_auth.Services
     {
         private readonly IMongoCollection<Post> _posts;
 
-        public PostService(IBookstoreDatabaseSettings settings)
+        public PostService(IRessourceDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);

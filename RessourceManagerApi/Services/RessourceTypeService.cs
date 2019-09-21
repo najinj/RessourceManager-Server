@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using RessourceManagerApi.Exceptions;
+using RessourceManagerApi.Exceptions.RessourceType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace test_mongo_auth.Services
     {
         private readonly IMongoCollection<RessourceType> _ressourceTypes;
 
-        public RessourceTypeService(IBookstoreDatabaseSettings settings)
+        public RessourceTypeService(IRessourceDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
@@ -34,15 +35,16 @@ namespace test_mongo_auth.Services
                 _ressourceTypes.InsertOne(ressourceType);
 
             }
-            catch (MongoDuplicateKeyException ex)
+            catch (MongoWriteException ex)
             {
-                throw new RessourceTypeDuplicateKeyException(ex.Message);
+                if(ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                    throw new RessourceTypeDuplicateKeyException(ex.Message);
             }
             return ressourceType;
         }
 
         public void Update(string id, RessourceType ressourceTypeIn) =>
-            _ressourceTypes.ReplaceOne(ressourceType => ressourceType.Id == id, ressourceTypeIn);
+            _ressourceTypes.ReplaceOne<RessourceType>(ressourceType => ressourceType.Id == id, ressourceTypeIn);
 
         public void Remove(RessourceType ressourceTypeIn) =>
             _ressourceTypes.DeleteOne(ressourceType => ressourceType.Id == ressourceTypeIn.Id);

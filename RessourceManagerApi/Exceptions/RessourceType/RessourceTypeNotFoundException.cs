@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RessourceManagerApi.Exceptions
+namespace RessourceManagerApi.Exceptions.RessourceType
 {
     public class RessourceTypeNotFoundException : Exception
     {

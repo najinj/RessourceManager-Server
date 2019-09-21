@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using RessourceManagerApi.Services;
 using test_mongo_auth.Models;
 using test_mongo_auth.Services;
 
@@ -41,11 +42,11 @@ namespace test_mongo_auth
                 options.SuppressUseValidationProblemDetailsForInvalidModelStateResponses = false;
             });
 
-            services.Configure<BookstoreDatabaseSettings>(
-                      Configuration.GetSection(nameof(BookstoreDatabaseSettings)));
+            services.Configure<RessourceDatabaseSettings>(
+                      Configuration.GetSection(nameof(RessourceDatabaseSettings)));
 
-            services.AddSingleton<IBookstoreDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<BookstoreDatabaseSettings>>().Value);
+            services.AddSingleton<IRessourceDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<RessourceDatabaseSettings>>().Value);
 
             var mongoDbIdentityConfiguration = new MongoDbIdentityConfiguration
             {
@@ -103,9 +104,9 @@ namespace test_mongo_auth
 
 
 
-
+            services.AddSingleton<EmailSenderService>();
             services.AddSingleton<PostService>();
-            services.AddSingleton<AreaService>();
+            services.AddSingleton<SpaceService>();
             services.AddSingleton<AssetService>();
             services.AddSingleton<RessourceTypeService>();
 
@@ -211,9 +212,9 @@ namespace test_mongo_auth
             }
             //Assign Admin role to the main User here we have given our newly registered 
             //login id for Admin management
-            ApplicationUser user = await UserManager.FindByEmailAsync("naji@naji.com");
-            var User = new ApplicationUser();
-            await UserManager.AddToRoleAsync(user, "Admin");
+            ApplicationUser user = await UserManager.FindByEmailAsync("naji.ensat@gmailcom");
+            if(user != null)
+                 await UserManager.AddToRoleAsync(user, "Admin");
         }
     }
 }

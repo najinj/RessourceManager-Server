@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using RessourceManagerApi.Exceptions;
+using RessourceManagerApi.Exceptions.RessourceType;
 using test_mongo_auth.Models.RessourceTypes;
 using test_mongo_auth.Services;
 
@@ -44,37 +47,51 @@ namespace test_mongo_auth.Controllers
 
         // POST: api/RessourceType
         //  [Authorize(Roles = "Admin")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<RessourceType> Create(RessourceType ressourceType)
         {
-            try
+            if (ModelState.IsValid)
             {
-                _ressourceTypeService.Create(ressourceType);
-            }
-            catch(Exception ex)
-            {
-                ModelState.AddModelError("AreaTypeId", ex.Message);
-                return BadRequest(new ValidationProblemDetails(ModelState));
-            }
+                try
+                {
+                    _ressourceTypeService.Create(ressourceType);
+                }
+                catch (RessourceTypeDuplicateKeyException ex)
+                {
+                    ModelState.AddModelError("Name", ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+                catch (Exception ex)
+                {
+                    var test = ex.GetType();
+                    return StatusCode(500, "Internal server error");
+                }
 
-            return CreatedAtRoute("GetPost", new { id = ressourceType.Id.ToString() }, ressourceType);
+                return CreatedAtRoute("GetRessourceType", new { id = ressourceType.Id.ToString() }, ressourceType);
+            }
+            return BadRequest(new ValidationProblemDetails(ModelState));
+
         }
 
         // PUT: api/RessourceType/5
         [HttpPut("{id:length(24)}")]
         public IActionResult Update(string id, RessourceType ressourceTypeIn)
         {
-            var post = _ressourceTypeService.Get(id);
-
-            if (post == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                var post = _ressourceTypeService.Get(id);
+
+                if (post == null)
+                {
+                    return NotFound();
+                }
+
+                _ressourceTypeService.Update(id, ressourceTypeIn);
+
+                return NoContent();
             }
-
-            _ressourceTypeService.Update(id, ressourceTypeIn);
-
-            return NoContent();
+            return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
         // DELETE: api/ApiWithActions/5

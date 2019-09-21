@@ -15,10 +15,6 @@ namespace test_mongo_auth.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            var jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJuYWppQG5hamkuY29tIiwianRpIjoiYWU3ZWFiNTItN2FkMy00OGIyLTg2MzUtMTQ1MzQ1NTQyNWQwIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiI4ZGEyMThmZC00YTE4LTQ5NWYtYTE4MC02NWQ0ZjA0YzQ0ZjUiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiVXNlciIsIkFkbWluIl0sImV4cCI6MTU3MTU4MTU2MywiaXNzIjoiWW91ckF3ZXNvbWVDb21wYW55IiwiYXVkIjoiWW91ckF3ZXNvbWVDb21wYW55In0.J2cbiXWkbqaLh05qWOnUgUoP4w4iCWhN8Hb-q9oLlD4";
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(jwt);
-
             return new string[] { "value1", "value2" };
         }
 
