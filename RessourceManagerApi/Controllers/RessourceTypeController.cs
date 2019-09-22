@@ -86,8 +86,14 @@ namespace test_mongo_auth.Controllers
                 {
                     return NotFound();
                 }
-
-                _ressourceTypeService.Update(id, ressourceTypeIn);
+                try
+                {
+                    _ressourceTypeService.Update(id, ressourceTypeIn);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "Internal server error");
+                }               
 
                 return NoContent();
             }

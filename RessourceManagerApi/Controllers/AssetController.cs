@@ -76,9 +76,14 @@ namespace test_mongo_auth.Controllers
                 {
                     return NotFound();
                 }
-
-                _assetService.Update(id, assetIn);
-
+                try
+                {
+                    _assetService.Update(id, assetIn);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "Internal server error");
+                }             
                 return NoContent();
             }
             return BadRequest(new ValidationProblemDetails(ModelState));

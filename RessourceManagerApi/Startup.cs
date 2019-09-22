@@ -103,7 +103,7 @@ namespace test_mongo_auth
             });
 
 
-
+            services.AddSingleton<ReservationService>();
             services.AddSingleton<EmailSenderService>();
             services.AddSingleton<PostService>();
             services.AddSingleton<SpaceService>();
@@ -111,68 +111,6 @@ namespace test_mongo_auth
             services.AddSingleton<RessourceTypeService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            
-
-            /*  services.AddIdentity<ApplicationUser, ApplicationRole>()
-                          .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
-                          (
-                              "mongodb://localhost:27017",
-                              "BookstoreDb"
-                          )
-                          .AddDefaultTokenProviders();
-              var mongoDbIdentityConfiguration = new MongoDbIdentityConfiguration
-              {
-                  MongoDbSettings = new MongoDbSettings
-                  {
-                      ConnectionString = "mongodb://localhost:27017",
-                      DatabaseName = "BookstoreDb"
-                  },
-                  IdentityOptionsAction = options =>
-                  {
-                      options.Password.RequireDigit = false;
-                      options.Password.RequiredLength = 8;
-                      options.Password.RequireNonAlphanumeric = false;
-                      options.Password.RequireUppercase = false;
-                      options.Password.RequireLowercase = false;
-
-                      // Lockout settings
-                      options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                      options.Lockout.MaxFailedAccessAttempts = 10;
-
-                      // ApplicationUser settings
-                      options.User.RequireUniqueEmail = true;
-                      options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_";
-                  }
-              };
-              JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-              services.ConfigureMongoDbIdentity<ApplicationUser, ApplicationRole, Guid>(mongoDbIdentityConfiguration);
-
-              services.AddAuthentication(options =>
-              {
-                  //Set default Authentication Schema as Bearer
-                  options.DefaultAuthenticateScheme =
-                             JwtBearerDefaults.AuthenticationScheme;
-                  options.DefaultScheme =
-                             JwtBearerDefaults.AuthenticationScheme;
-                  options.DefaultChallengeScheme =
-                             JwtBearerDefaults.AuthenticationScheme;
-              }).AddJwtBearer(cfg =>
-              {
-                  cfg.RequireHttpsMetadata = false;
-                  cfg.SaveToken = true;
-                  cfg.TokenValidationParameters =
-                         new TokenValidationParameters
-                         {
-                             ValidIssuer = Configuration["JwtIssuer"],
-                             ValidAudience = Configuration["JwtIssuer"],
-                             IssuerSigningKey =
-                          new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
-                             ClockSkew = TimeSpan.Zero // remove delay of token when expire
-                         };
-              });
-              */
 
         }
 

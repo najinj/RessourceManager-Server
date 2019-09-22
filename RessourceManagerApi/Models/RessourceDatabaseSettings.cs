@@ -13,6 +13,7 @@ namespace test_mongo_auth.Models
         public string BooksCollectionName { get; set; }
         public string PostsCollectionName { get; set; }
         public string UsersCollectionName { get; set; }
+        public string ReservationsCollectionName { get; set; }
         public string EmailSettings { get; set; }
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
@@ -26,6 +27,7 @@ namespace test_mongo_auth.Models
         string BooksCollectionName { get; set; }
         string PostsCollectionName { get; set; }
         string UsersCollectionName { get; set; }
+        string ReservationsCollectionName { get; set; }
         string EmailSettings { get; set; }
         string ConnectionString { get; set; }
         string DatabaseName { get; set; }
