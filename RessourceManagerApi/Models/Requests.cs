@@ -31,7 +31,7 @@ namespace test_mongo_auth.Models.Requests
             [Display(Name = "LastName")]
             public string LastName { get; set; }
 
-            [Required]
+            // [Required]
             [Display(Name = "City")]
             public string City { get; set; }
         }

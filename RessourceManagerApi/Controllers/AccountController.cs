@@ -12,9 +12,11 @@ using test_mongo_auth.Models.Responses;
 using test_mongo_auth.Helpers;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Cors;
 
 namespace test_mongo_auth.Controllers
 {
+    [EnableCors("MyPolicy")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AccountController : ControllerBase

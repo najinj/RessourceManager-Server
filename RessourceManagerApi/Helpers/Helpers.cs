@@ -18,13 +18,14 @@ namespace test_mongo_auth.Helpers
         public async static Task<string> GenerateJwtToken(string email, ApplicationUser user, IConfiguration configuration , UserManager<ApplicationUser> userManager)
         {
             var userRoles = await userManager.GetRolesAsync(user);
-            
+
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, email),
+                new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(JwtRegisteredClaimNames.Sid, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName)
             };
 
             foreach (var userRole in userRoles)
