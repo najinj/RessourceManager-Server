@@ -93,9 +93,9 @@ namespace test_mongo_auth.Controllers
                 catch (Exception ex)
                 {
                     return StatusCode(500, "Internal server error");
-                }               
+                }
 
-                return NoContent();
+                return CreatedAtRoute("GetRessourceType", new { id = ressourceTypeIn.Id.ToString() }, ressourceTypeIn);
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
