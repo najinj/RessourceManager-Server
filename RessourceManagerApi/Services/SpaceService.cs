@@ -30,14 +30,16 @@ namespace test_mongo_auth.Services
         public Space Get(string id) =>
             _spaces.Find(space => space.Id == id).FirstOrDefault();
 
-        public Space Create(Space space)
+        public Space Create(Space spaceIn)
         {
-            var ressourceType = _ressourceTypes.Find(resourceType => resourceType.Id == space.SpaceTypeId).FirstOrDefault();
-            if (ressourceType == null)
+            var ressourceTypeIn = _ressourceTypes.Find(resourceType => resourceType.Id == spaceIn.SpaceTypeId).FirstOrDefault();
+            if (ressourceTypeIn == null)
                 throw new RessourceTypeNotFoundException("Can't find Ressource Type");
             try
             {
-                _spaces.InsertOne(space);
+                ressourceTypeIn.Count++; // Increamenting count when adding an asset
+                _ressourceTypes.ReplaceOne(ressourceType => ressourceType.Id == ressourceTypeIn.Id, ressourceTypeIn);
+                _spaces.InsertOne(spaceIn);
 
             }
             catch (MongoWriteException ex)
@@ -45,14 +47,22 @@ namespace test_mongo_auth.Services
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                     throw new SpaceDuplicateKeyException(ex.Message);
             }
-            return space;
+            return spaceIn;
         }
 
         public void Update(string id, Space spaceIn) =>
             _spaces.ReplaceOne(space => space.Id == id, spaceIn);
 
-        public void Remove(Space spaceIn) =>
+        public void Remove(Space spaceIn)
+        {
+            var ressourceTypeIn = _ressourceTypes.Find(resourceType => resourceType.Id == spaceIn.SpaceTypeId).FirstOrDefault();
+            if (ressourceTypeIn == null)
+                throw new RessourceTypeNotFoundException("Can't find Ressource Type");
+            ressourceTypeIn.Count++; // Decreassing count when removing an asset
+            _ressourceTypes.ReplaceOne(ressourceType => ressourceType.Id == ressourceTypeIn.Id, ressourceTypeIn);
             _spaces.DeleteOne(space => space.Id == spaceIn.Id);
+        }
+            
 
         public void Remove(string id) =>
             _spaces.DeleteOne(space => space.Id == id);

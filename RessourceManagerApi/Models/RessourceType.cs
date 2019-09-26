@@ -19,6 +19,7 @@ namespace test_mongo_auth.Models.RessourceTypes
         [Required]
         public RType Type { get; set; }
         public string Description { get; set; }
+        public int Count { get; set; }
     }
     
 }

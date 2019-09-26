@@ -31,11 +31,13 @@ namespace test_mongo_auth.Services
 
         public Asset Create(Asset asset)
         {
-            var ressourceType = _ressourceTypes.Find(resourceType => resourceType.Id == asset.AssetTypeId).FirstOrDefault();
-            if (ressourceType == null)
+            var ressourceTypeIn = _ressourceTypes.Find(resourceType => resourceType.Id == asset.AssetTypeId).FirstOrDefault();
+            if (ressourceTypeIn == null)
                 throw new RessourceTypeNotFoundException("Can't find Ressource Type");
             try
             {
+                ressourceTypeIn.Count++; // Increamenting count when adding an asset
+                _ressourceTypes.ReplaceOne(ressourceType => ressourceType.Id == ressourceTypeIn.Id, ressourceTypeIn);
                 _assets.InsertOne(asset);
 
             }
@@ -45,14 +47,22 @@ namespace test_mongo_auth.Services
                     throw new AssetDuplicateKeyException(ex.Message);
             }
             catch (Exception ex)
-            {               
+            {
                 throw new Exception();
             }
             return asset;
         }
 
-        public void Update(string id, Asset assetIn) =>
+        public void Update(string id, Asset assetIn) {
+            var ressourceTypeIn = _ressourceTypes.Find(resourceType => resourceType.Id == assetIn.AssetTypeId).FirstOrDefault();
+            if (ressourceTypeIn == null)
+                throw new RessourceTypeNotFoundException("Can't find Ressource Type");
+            ressourceTypeIn.Count++; // Decreassing count when removing an asset
+            _ressourceTypes.ReplaceOne(ressourceType=> ressourceType.Id == ressourceTypeIn.Id, ressourceTypeIn); 
             _assets.ReplaceOne(asset => asset.Id == id, assetIn);
+        
+        }
+            
 
         public void Remove(Asset assetIn) =>
             _assets.DeleteOne(asset => asset.Id == assetIn.Id);

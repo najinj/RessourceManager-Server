@@ -32,8 +32,8 @@ namespace test_mongo_auth.Services
         {
             try
             {
+                ressourceType.Count = 0; // Make sure the count is 0 at creation
                 _ressourceTypes.InsertOne(ressourceType);
-
             }
             catch (MongoWriteException ex)
             {
