@@ -13,7 +13,7 @@ using test_mongo_auth.Services;
 
 namespace test_mongo_auth.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class RessourceTypeController : ControllerBase
     {
@@ -43,6 +43,19 @@ namespace test_mongo_auth.Controllers
             }
 
             return ressourceType;
+        }
+
+        [HttpGet]
+        public ActionResult<List<RessourceType>> GetRessourceTypeByType(int type)
+        {
+            var ressourceTypes = _ressourceTypeService.Get(type);
+
+            if (ressourceTypes == null)
+            {
+                return NotFound();
+            }
+
+            return ressourceTypes;
         }
 
         // POST: api/RessourceType

@@ -87,8 +87,7 @@ namespace test_mongo_auth.Controllers
                 {
                     return StatusCode(500, "Internal server error");
                 }
-
-                return NoContent();
+                return CreatedAtRoute("GetSpace", new { id = spaceIn.Id.ToString() }, spaceIn);
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
 

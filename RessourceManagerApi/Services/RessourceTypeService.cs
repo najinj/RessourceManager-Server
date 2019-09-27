@@ -28,6 +28,9 @@ namespace test_mongo_auth.Services
         public RessourceType Get(string id) =>
             _ressourceTypes.Find<RessourceType>(ressourceType => ressourceType.Id == id).FirstOrDefault();
 
+        public List<RessourceType> Get(int id) =>
+            _ressourceTypes.Find<RessourceType>(ressourceType => ressourceType.Type == (RType)id).ToList();
+
         public RessourceType Create(RessourceType ressourceType)
         {
             try
