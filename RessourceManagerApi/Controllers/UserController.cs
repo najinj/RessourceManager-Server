@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManagerApi.Services;
 using test_mongo_auth.Models;
+using test_mongo_auth.Models.Responses;
 
 namespace RessourceManagerApi.Controllers
 {
@@ -17,16 +18,22 @@ namespace RessourceManagerApi.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly EmailSenderService _emailService;
-        public UserController(UserManager<ApplicationUser> userManager,RoleManager<ApplicationRole> roleManager,EmailSenderService emailService)
+        public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, EmailSenderService emailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _emailService = emailService;
         }
 
-        
+
         [HttpGet]
-        public List<ApplicationUser> Get() =>  _userManager.Users.ToList();
+        public List<UserDataResponse> Get() => _userManager.Users.Select(user => new UserDataResponse
+        {
+            Name = user.Name,
+            Activated = user.Activated,
+            Email = user.Email,
+            LastName = user.LastName
+        }).ToList();
 
 
         [HttpGet]
@@ -34,7 +41,7 @@ namespace RessourceManagerApi.Controllers
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                  return NotFound();
+                return NotFound();
             user.Activated = !user.Activated;
             var result = await _userManager.UpdateAsync(user);
             if (user.Activated)
@@ -56,7 +63,13 @@ namespace RessourceManagerApi.Controllers
                 ModelState.AddModelError("Activated", "Couldn't Update User");
                 return BadRequest(new ValidationProblemDetails(ModelState));
             }
-            return Ok();
+            return Ok(new UserDataResponse
+            {
+                Name = user.Name,
+                Activated = user.Activated,
+                Email = user.Email,
+                LastName = user.LastName
+            });
         }
 
 

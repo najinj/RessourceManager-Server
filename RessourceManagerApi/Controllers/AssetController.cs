@@ -10,7 +10,7 @@ using test_mongo_auth.Services;
 
 namespace test_mongo_auth.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AssetController : ControllerBase
     {

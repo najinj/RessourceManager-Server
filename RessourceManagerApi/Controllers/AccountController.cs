@@ -47,8 +47,8 @@ namespace test_mongo_auth.Controllers
             {
                 Name = user.UserName,
                 LastName = user.LastName,
-                City = user.City,
-                Email = user.Email
+                Email = user.Email,
+                Activated = user.Activated
             };
             return Ok(userData);
         }
