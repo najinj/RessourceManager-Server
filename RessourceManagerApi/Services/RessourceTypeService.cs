@@ -1,12 +1,9 @@
 ﻿using MongoDB.Driver;
-using RessourceManagerApi.Exceptions;
+using RessourceManager.Core.Models.V1;
 using RessourceManagerApi.Exceptions.RessourceType;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using test_mongo_auth.Models;
-using test_mongo_auth.Models.RessourceTypes;
 
 namespace test_mongo_auth.Services
 {
@@ -26,10 +23,10 @@ namespace test_mongo_auth.Services
             _ressourceTypes.Find(ressourceType => true).ToList();
 
         public RessourceType Get(string id) =>
-            _ressourceTypes.Find<RessourceType>(ressourceType => ressourceType.Id == id).FirstOrDefault();
+            _ressourceTypes.Find(ressourceType => ressourceType.Id == id).FirstOrDefault();
 
         public List<RessourceType> Get(int id) =>
-            _ressourceTypes.Find<RessourceType>(ressourceType => ressourceType.Type == (RType)id).ToList();
+            _ressourceTypes.Find(ressourceType => ressourceType.Type == (RType)id).ToList();
 
         public RessourceType Create(RessourceType ressourceType)
         {
@@ -47,7 +44,7 @@ namespace test_mongo_auth.Services
         }
 
         public void Update(string id, RessourceType ressourceTypeIn) =>
-            _ressourceTypes.ReplaceOne<RessourceType>(ressourceType => ressourceType.Id == id, ressourceTypeIn);
+            _ressourceTypes.ReplaceOne(ressourceType => ressourceType.Id == id, ressourceTypeIn);
 
         public void Remove(RessourceType ressourceTypeIn) =>
             _ressourceTypes.DeleteOne(ressourceType => ressourceType.Id == ressourceTypeIn.Id);

@@ -1,13 +1,9 @@
 ﻿using AspNetCore.Identity.MongoDbCore.Models;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDbGenericRepository.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace test_mongo_auth.Models
+
+namespace RessourceManager.Core.Models.V1
 {
     [CollectionName("Users")]
     public class ApplicationUser : MongoIdentityUser<Guid>
@@ -22,16 +18,5 @@ namespace test_mongo_auth.Models
         public string Country { get; set; }
         public string State { get; set; }
         public string City { get; set; }
-    }
-
-    public class ApplicationRole : MongoIdentityRole<Guid>
-    {
-        public ApplicationRole() : base()
-        {
-        }
-
-        public ApplicationRole(string roleName) : base(roleName)
-        {
-        }
     }
 }

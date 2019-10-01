@@ -1,8 +1,6 @@
 ﻿
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AspNetCore.Identity.MongoDbCore.Extensions;
@@ -10,14 +8,13 @@ using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using RessourceManager.Core.Models.V1;
 using RessourceManagerApi.Services;
 using test_mongo_auth.Models;
 using test_mongo_auth.Services;

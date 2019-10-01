@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RessourceManager.Core.Models.V1;
 using RessourceManagerApi.Exceptions.Asset;
-using test_mongo_auth.Models.Ressource;
 using test_mongo_auth.Services;
 
 namespace test_mongo_auth.Controllers
@@ -59,7 +56,7 @@ namespace test_mongo_auth.Controllers
                     return StatusCode(500, "Internal server error");
                 }
 
-                return CreatedAtRoute("GetSpace", new { id = asset.Id.ToString() }, asset);
+                return CreatedAtRoute("GetAsset", new { id = asset.Id.ToString() }, asset);
             }
             
             return BadRequest(new ValidationProblemDetails(ModelState));
@@ -83,8 +80,8 @@ namespace test_mongo_auth.Controllers
                 catch (Exception ex)
                 {
                     return StatusCode(500, "Internal server error");
-                }             
-                return NoContent();
+                }
+                return CreatedAtRoute("GetAsset", new { id = assetIn.Id.ToString() }, assetIn);
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
 

@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.ViewModels.Authentication;
 using RessourceManagerApi.Services;
-using test_mongo_auth.Models;
-using test_mongo_auth.Models.Responses;
 
 namespace RessourceManagerApi.Controllers
 {
@@ -58,10 +57,13 @@ namespace RessourceManagerApi.Controllers
                         // TODO: handle exception
                         return BadRequest(ex.Message); // return activated but email not sent // do a quee for later ?
                     }
-                    return Ok();
                 }
-                ModelState.AddModelError("Activated", "Couldn't Update User");
-                return BadRequest(new ValidationProblemDetails(ModelState));
+                else
+                {
+                    ModelState.AddModelError("Activated", "Couldn't Update User");
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+                
             }
             return Ok(new UserDataResponse
             {

@@ -1,12 +1,12 @@
 ﻿using MimeKit;
 using MongoDB.Driver;
-using RessourceManagerApi.Models;
 using System;
 using MailKit.Net.Smtp;
 using System.Threading.Tasks;
 using test_mongo_auth.Models;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using RessourceManager.Core.Models.V1;
 
 namespace RessourceManagerApi.Services
 {

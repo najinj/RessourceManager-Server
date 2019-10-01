@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using RessourceManager.Core.Models.V1;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using test_mongo_auth.Models;
 
 namespace test_mongo_auth.Helpers
 {

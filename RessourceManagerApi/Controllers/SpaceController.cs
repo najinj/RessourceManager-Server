@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using RessourceManagerApi.Exceptions;
+using RessourceManager.Core.Models.V1;
 using RessourceManagerApi.Exceptions.RessourceType;
 using RessourceManagerApi.Exceptions.Space;
-using test_mongo_auth.Models.Ressource;
 using test_mongo_auth.Services;
 
 namespace test_mongo_auth.Controllers

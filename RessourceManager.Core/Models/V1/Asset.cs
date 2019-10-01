@@ -1,13 +1,13 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace test_mongo_auth.Models.Ressource
+
+
+
+namespace RessourceManager.Core.Models.V1
 {
+
     public enum Status { Chained, Unchained };
     public class Asset
     {
@@ -23,4 +23,5 @@ namespace test_mongo_auth.Models.Ressource
         [Required]
         public string Name { set; get; }
     }
+    
 }

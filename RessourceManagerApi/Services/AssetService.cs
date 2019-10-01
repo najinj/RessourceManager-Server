@@ -1,12 +1,12 @@
 ﻿using MongoDB.Driver;
+using RessourceManager.Core.Models.V1;
 using RessourceManagerApi.Exceptions.Asset;
 using RessourceManagerApi.Exceptions.RessourceType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using test_mongo_auth.Models;
-using test_mongo_auth.Models.Ressource;
-using test_mongo_auth.Models.RessourceTypes;
+
 
 namespace test_mongo_auth.Services
 {

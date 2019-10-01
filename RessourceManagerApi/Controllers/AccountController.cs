@@ -6,13 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using test_mongo_auth.Models;
-using test_mongo_auth.Models.Requests;
-using test_mongo_auth.Models.Responses;
 using test_mongo_auth.Helpers;
-using System.Collections.Generic;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Cors;
+using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.ViewModels.Authentication;
 
 namespace test_mongo_auth.Controllers
 {

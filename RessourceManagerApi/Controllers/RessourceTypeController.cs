@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using RessourceManagerApi.Exceptions;
+using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.ViewModels.RessourceType;
 using RessourceManagerApi.Exceptions.RessourceType;
-using test_mongo_auth.Models.RessourceTypes;
 using test_mongo_auth.Services;
 
 namespace test_mongo_auth.Controllers
@@ -89,19 +84,19 @@ namespace test_mongo_auth.Controllers
 
         // PUT: api/RessourceType/5
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, RessourceType ressourceTypeIn)
+        public IActionResult Update(string id, RessourceTypeViewModel ressourceTypeIn)
         {
             if (ModelState.IsValid)
             {
-                var post = _ressourceTypeService.Get(id);
-
-                if (post == null)
-                {
+                var ressourceTypeToUpdate = _ressourceTypeService.Get(id);
+                if (ressourceTypeToUpdate == null)
                     return NotFound();
-                }
                 try
                 {
-                    _ressourceTypeService.Update(id, ressourceTypeIn);
+                    ressourceTypeToUpdate.Type = ressourceTypeIn.Type;
+                    ressourceTypeToUpdate.Name = ressourceTypeIn.Name;
+                    ressourceTypeToUpdate.Description = ressourceTypeIn.Description;
+                    _ressourceTypeService.Update(id, ressourceTypeToUpdate);
                 }
                 catch (Exception ex)
                 {
