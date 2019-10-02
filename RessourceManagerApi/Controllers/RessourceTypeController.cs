@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.ViewModels.RessourceType;
 using RessourceManagerApi.Exceptions.RessourceType;
-using test_mongo_auth.Services;
+using RessourceManager.Core.Services;
+using RessourceManager.Core.Services.Interfaces;
 
 namespace test_mongo_auth.Controllers
 {
@@ -12,10 +14,10 @@ namespace test_mongo_auth.Controllers
     [ApiController]
     public class RessourceTypeController : ControllerBase
     {
-        private readonly RessourceTypeService _ressourceTypeService;
+        private readonly IRessourceTypeService _ressourceTypeService;
 
 
-        public RessourceTypeController(RessourceTypeService ressourceTypeService)
+        public RessourceTypeController(IRessourceTypeService ressourceTypeService)
         {
             _ressourceTypeService = ressourceTypeService;
         }
@@ -23,14 +25,17 @@ namespace test_mongo_auth.Controllers
 
         // GET: api/RessourceType
         [HttpGet]
-        public ActionResult<List<RessourceType>> Get() =>
-            _ressourceTypeService.Get();
+        public async Task<ActionResult<List<RessourceType>>> Get() {
+                var list = await _ressourceTypeService.Get();
+                return list;
+        }
+            
 
         // GET: api/RessourceType/5
         [HttpGet("{id:length(24)}", Name = "GetRessourceType")]
-        public ActionResult<RessourceType> Get(string id)
+        public async Task<ActionResult<RessourceType>> Get(string id)
         {
-            var ressourceType = _ressourceTypeService.Get(id);
+            var ressourceType = await _ressourceTypeService.Get(id);
 
             if (ressourceType == null)
             {
@@ -41,9 +46,9 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<RessourceType>> GetRessourceTypeByType(int type)
+        public async  Task<ActionResult<List<RessourceType>>> GetRessourceTypeByType(int type)
         {
-            var ressourceTypes = _ressourceTypeService.Get(type);
+            var ressourceTypes = await _ressourceTypeService.GetByType(type);
 
             if (ressourceTypes == null)
             {
@@ -84,11 +89,11 @@ namespace test_mongo_auth.Controllers
 
         // PUT: api/RessourceType/5
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, RessourceTypeViewModel ressourceTypeIn)
+        public async Task<IActionResult> Update(string id, RessourceTypeViewModel ressourceTypeIn)
         {
             if (ModelState.IsValid)
             {
-                var ressourceTypeToUpdate = _ressourceTypeService.Get(id);
+                var ressourceTypeToUpdate = await _ressourceTypeService.Get(id);
                 if (ressourceTypeToUpdate == null)
                     return NotFound();
                 try
@@ -96,7 +101,7 @@ namespace test_mongo_auth.Controllers
                     ressourceTypeToUpdate.Type = ressourceTypeIn.Type;
                     ressourceTypeToUpdate.Name = ressourceTypeIn.Name;
                     ressourceTypeToUpdate.Description = ressourceTypeIn.Description;
-                    _ressourceTypeService.Update(id, ressourceTypeToUpdate);
+                    _ressourceTypeService.Update(ressourceTypeToUpdate);
                 }
                 catch (Exception ex)
                 {
@@ -110,9 +115,9 @@ namespace test_mongo_auth.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var ressourceType = _ressourceTypeService.Get(id);
+            var ressourceType = await _ressourceTypeService.Get(id);
 
             if (ressourceType == null)
             {

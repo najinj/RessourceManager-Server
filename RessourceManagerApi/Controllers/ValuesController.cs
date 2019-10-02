@@ -4,6 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using RessourceManager.Core.Context;
+using RessourceManager.Core.Repositories.Interfaces;
 
 namespace test_mongo_auth.Controllers
 {
@@ -11,6 +13,12 @@ namespace test_mongo_auth.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly IMongoContext _mongo;
+
+        public ValuesController(IMongoContext context)
+        {
+            _mongo = context;
+        }
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()

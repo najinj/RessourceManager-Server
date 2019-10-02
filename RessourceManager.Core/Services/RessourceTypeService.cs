@@ -2,19 +2,20 @@
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Repositories;
 using RessourceManager.Core.Repositories.Interfaces;
+using RessourceManager.Core.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace test_mongo_auth.Services
+namespace RessourceManager.Core.Services
 {
-    public class RessourceTypeService
+    public class RessourceTypeService : IRessourceTypeService
     {
         private readonly IRessourceTypeRepository _ressourceTypeRepository;
 
 
-        public RessourceTypeService(RessourceTypeRepository ressourceTypeRepository)
+        public RessourceTypeService(IRessourceTypeRepository ressourceTypeRepository)
         {
             _ressourceTypeRepository = ressourceTypeRepository;
         }

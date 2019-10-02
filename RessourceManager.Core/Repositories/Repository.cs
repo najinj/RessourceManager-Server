@@ -31,7 +31,7 @@ namespace RessourceManager.Core.Repositories
 
         public virtual async Task<IEnumerable<TEntity>> GetAll()
         {
-            var all = await DbSet.FindAsync(Builders<TEntity>.Filter.Empty);
+            var all = await DbSet.FindAsync(entity => true);
             return all.ToList();
         }
 

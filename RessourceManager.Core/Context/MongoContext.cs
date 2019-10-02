@@ -16,7 +16,7 @@ namespace RessourceManager.Core.Context
         private IMongoDatabase Database { get; set; }
         public MongoClient MongoClient { get; set; }
         private readonly List<Func<Task>> _commands;
-        public MongoContext(IConfiguration configuration , IRessourceDatabaseSettings settings)
+        public MongoContext(IRessourceDatabaseSettings settings)
         {
             // Set Guid to CSharp style (with dash -)
             BsonDefaults.GuidRepresentation = GuidRepresentation.CSharpLegacy;
@@ -24,7 +24,7 @@ namespace RessourceManager.Core.Context
             // Every command will be stored and it'll be processed at SaveChanges
             _commands = new List<Func<Task>>();
 
-            RegisterConventions();
+          //  RegisterConventions();
 
             // Configure mongo (You can inject the config, just to simplify)
             MongoClient = new MongoClient(settings.ConnectionString);

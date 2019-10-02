@@ -6,6 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\**" />
+    <Content Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\AccountController.cs" />
+    <Compile Remove="Controllers\AssetController.cs" />
+    <Compile Remove="Controllers\PostsController.cs" />
+    <Compile Remove="Controllers\ReservationController.cs" />
+    <Compile Remove="Controllers\SpaceController.cs" />
+    <Compile Remove="Controllers\UserController.cs" />
     <Compile Remove="Models\ApplicationUser.cs" />
   </ItemGroup>
 

@@ -14,10 +14,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using RessourceManager.Core.Context;
 using RessourceManager.Core.Models.V1;
-using RessourceManagerApi.Services;
-using test_mongo_auth.Models;
-using test_mongo_auth.Services;
+using RessourceManager.Core.Repositories;
+using RessourceManager.Core.Repositories.Interfaces;
+using RessourceManager.Core.Services;
+using RessourceManager.Core.Services.Interfaces;
 
 namespace test_mongo_auth
 {
@@ -49,8 +51,7 @@ namespace test_mongo_auth
                 options.SuppressUseValidationProblemDetailsForInvalidModelStateResponses = false;
             });
 
-            services.Configure<RessourceDatabaseSettings>(
-                      Configuration.GetSection(nameof(RessourceDatabaseSettings)));
+           /* 
 
             services.AddSingleton<IRessourceDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<RessourceDatabaseSettings>>().Value);
@@ -80,6 +81,7 @@ namespace test_mongo_auth
                 }
             };
             services.ConfigureMongoDbIdentity<ApplicationUser, ApplicationRole, Guid>(mongoDbIdentityConfiguration);
+            */
 
 
 
@@ -110,14 +112,10 @@ namespace test_mongo_auth
             });
 
 
-            services.AddSingleton<ReservationService>();
-            services.AddSingleton<EmailSenderService>();
-            services.AddSingleton<PostService>();
-            services.AddSingleton<SpaceService>();
-            services.AddSingleton<AssetService>();
-            services.AddSingleton<RessourceTypeService>();
 
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            RegisterServices(services);
 
         }
 
@@ -137,7 +135,7 @@ namespace test_mongo_auth
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseMvc();
-            CreateUserRoles(services).Wait();
+           // CreateUserRoles(services).Wait();
         }
 
 
@@ -160,6 +158,20 @@ namespace test_mongo_auth
             ApplicationUser user = await UserManager.FindByEmailAsync("naji.ensat@gmailcom");
             if(user != null)
                  await UserManager.AddToRoleAsync(user, "Admin");
+        }
+
+
+        private void RegisterServices(IServiceCollection services)
+        {
+            services.Configure<RessourceDatabaseSettings>(
+                      Configuration.GetSection(nameof(RessourceDatabaseSettings)));
+
+            services.AddSingleton<IRessourceDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<RessourceDatabaseSettings>>().Value);
+
+            services.AddSingleton<IMongoContext, MongoContext>();
+            services.AddSingleton<IRessourceTypeRepository, RessourceTypeRepository>();
+            services.AddScoped<IRessourceTypeService,RessourceTypeService>();           
         }
     }
 }
