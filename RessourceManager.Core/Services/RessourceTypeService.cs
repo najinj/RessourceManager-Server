@@ -44,6 +44,7 @@ namespace RessourceManager.Core.Services
             {
                 ressourceTypeIn.Count = 0; // Make sure the count is 0 at creation
                 _ressourceTypeRepository.Add(ressourceTypeIn);
+                
             }
             catch (Exception ex)
             {

@@ -21,6 +21,7 @@ namespace RessourceManager.Core.Repositories
         public virtual void Add(TEntity obj)
         {
             _context.AddCommand(() => DbSet.InsertOneAsync(obj));
+            _context.SaveChanges();
         }
 
         public virtual async Task<TEntity> GetById(Guid id)
