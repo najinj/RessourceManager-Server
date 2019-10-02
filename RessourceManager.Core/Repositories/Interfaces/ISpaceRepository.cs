@@ -1,10 +1,12 @@
-﻿using System;
+﻿using RessourceManager.Core.Models.V1;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace RessourceManager.Core.Repositories.Interfaces
 {
-    interface ISpaceRepository
+    public interface ISpaceRepository : IRepository<Space>
     {
+
     }
 }

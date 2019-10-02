@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RessourceManager.Core.Repositories.Interfaces
 {
-    interface IEmailSenderService
+    public interface IEmailSenderService 
     {
     }
 }

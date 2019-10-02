@@ -1,10 +1,11 @@
-﻿using System;
+﻿using RessourceManager.Core.Models.V1;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace RessourceManager.Core.Repositories.Interfaces
 {
-    class IReservationRepository
+    public interface IReservationRepository : IRepository<Reservation>
     {
     }
 }
