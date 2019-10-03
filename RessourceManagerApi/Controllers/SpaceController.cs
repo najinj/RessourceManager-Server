@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.Services.Interfaces;
 using RessourceManagerApi.Exceptions.RessourceType;
 using RessourceManagerApi.Exceptions.Space;
-using test_mongo_auth.Services;
 
 namespace test_mongo_auth.Controllers
 {
@@ -13,10 +14,10 @@ namespace test_mongo_auth.Controllers
     [ApiController]
     public class SpaceController : ControllerBase
     {
-        private readonly SpaceService _spaceService;
-        private readonly AssetService _assetService;
+        private readonly ISpaceService _spaceService;
+        private readonly IAssetService _assetService;
 
-        public SpaceController(SpaceService spaceService, AssetService assetService)
+        public SpaceController(ISpaceService spaceService, IAssetService assetService)
         {
             _spaceService = spaceService;
             _assetService = assetService;
@@ -24,13 +25,16 @@ namespace test_mongo_auth.Controllers
 
 
         [HttpGet]
-        public ActionResult<List<Space>> Get() =>
-            _spaceService.Get();
-
-        [HttpGet("{id:length(24)}", Name = "GetSpace")]
-        public ActionResult<Space> Get(string id)
+        public async Task<ActionResult<List<Space>>> Get()
         {
-            var space = _spaceService.Get(id);
+            var list = await _spaceService.Get();
+            return list;
+        }
+            
+        [HttpGet("{id:length(24)}", Name = "GetSpace")]
+        public async Task<ActionResult<Space>> Get(string id)
+        {
+            var space = await _spaceService.Get(id);
 
             if (space == null)
             {
@@ -79,7 +83,8 @@ namespace test_mongo_auth.Controllers
                 }
                 try
                 {
-                    _spaceService.Update(id, spaceIn);
+                    spaceIn.Id = id;
+                    _spaceService.Update(spaceIn);
                 }
                 catch (Exception ex)
                 {
@@ -92,9 +97,9 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var space = _spaceService.Get(id);
+            var space = await _spaceService.Get(id);
 
             if (space == null)
             {
@@ -113,10 +118,10 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpGet("{assetId}/{spaceId}")]
-        public IActionResult RemoveAssetFromSpace(string assetId,string spaceId)
+        public async Task<IActionResult> RemoveAssetFromSpace(string assetId,string spaceId)
         {
-            var spaceIn = _spaceService.Get(spaceId);
-            var assetIn = _assetService.Get(assetId);
+            var spaceIn = await _spaceService.Get(spaceId);
+            var assetIn = await _assetService.Get(assetId);
             if (spaceIn == null)
                 return NotFound("Space Not found");
             if(assetIn == null)
@@ -129,8 +134,8 @@ namespace test_mongo_auth.Controllers
             {
                // if (assetIn.Status == Status.Chained) 
                     assetIn.Status = Status.Unchained;  // if we remove a chained asset from space it becomes unchained and would be possible to reserve it           
-                _spaceService.Update(spaceId, spaceIn);
-                _assetService.Update(assetId, assetIn); // updating the status of the asset 
+                _spaceService.Update(spaceIn);
+                _assetService.Update(assetIn); // updating the status of the asset 
             }
             catch (Exception ex)
             {
@@ -140,10 +145,10 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpGet("{assetId}/{spaceId}")]
-        public IActionResult AddAssetToSpace(string assetId, string spaceId)
+        public async Task<IActionResult> AddAssetToSpace(string assetId, string spaceId)
         {
-            var spaceIn = _spaceService.Get(spaceId);
-            var assetIn = _assetService.Get(assetId);
+            var spaceIn = await _spaceService.Get(spaceId);
+            var assetIn = await _assetService.Get(assetId);
             if (spaceIn == null)
                 return NotFound("Space Not found");
             if (assetIn == null)
@@ -152,8 +157,8 @@ namespace test_mongo_auth.Controllers
             try
             {
                  assetIn.Status = Status.Chained;
-                _spaceService.Update(spaceId, spaceIn);
-                _assetService.Update(assetId, assetIn); // updating the status of the asset 
+                _spaceService.Update(spaceIn);
+                _assetService.Update(assetIn); // updating the status of the asset 
             }
             catch(Exception ex)
             {

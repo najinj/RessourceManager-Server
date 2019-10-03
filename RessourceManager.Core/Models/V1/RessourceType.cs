@@ -12,8 +12,10 @@ namespace RessourceManager.Core.Models.V1
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         [Required]
         public string Name { get; set; }
+
         [Required]
         public RType Type { get; set; }
         public string Description { get; set; }

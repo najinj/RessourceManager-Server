@@ -7,6 +7,11 @@ using RessourceManager.Core.ViewModels.RessourceType;
 using RessourceManagerApi.Exceptions.RessourceType;
 using RessourceManager.Core.Services;
 using RessourceManager.Core.Services.Interfaces;
+using RessourceManager.Core.Helpers;
+using System.Net.Http;
+using System.Linq;
+using Newtonsoft.Json;
+using RessourceManager.Core.Exceptions.RessourceType;
 
 namespace test_mongo_auth.Controllers
 {
@@ -15,11 +20,13 @@ namespace test_mongo_auth.Controllers
     public class RessourceTypeController : ControllerBase
     {
         private readonly IRessourceTypeService _ressourceTypeService;
+        private readonly IErrorHandler _errorHandler;
 
 
-        public RessourceTypeController(IRessourceTypeService ressourceTypeService)
+        public RessourceTypeController(IRessourceTypeService ressourceTypeService, IErrorHandler errorHandler)
         {
             _ressourceTypeService = ressourceTypeService;
+            _errorHandler = errorHandler;
         }
 
 
@@ -62,29 +69,26 @@ namespace test_mongo_auth.Controllers
         //  [Authorize(Roles = "Admin")]
         //[Authorize(Roles = "Admin")]
         [HttpPost]
-        public ActionResult<RessourceType> Create(RessourceType ressourceType)
+        public async Task<ActionResult<RessourceType>> Create(RessourceType ressourceType)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                 return BadRequest(new ValidationProblemDetails(ModelState));
+            try
             {
-                try
-                {
-                    _ressourceTypeService.Create(ressourceType);
-                }
-                catch (RessourceTypeDuplicateKeyException ex)
-                {
-                    ModelState.AddModelError("Name", ex.Message);
-                    return BadRequest(new ValidationProblemDetails(ModelState));
-                }
-                catch (Exception ex)
-                {
-                    var test = ex.GetType();
-                    return StatusCode(500, "Internal server error");
-                }
-
-                return CreatedAtRoute("GetRessourceType", new { id = ressourceType.Id.ToString() }, ressourceType);
+               await _ressourceTypeService.Create(ressourceType);
             }
-            return BadRequest(new ValidationProblemDetails(ModelState));
+            catch (RessourceTypeRepositoryException ex)
+            {
+                ModelState.AddModelError("Name", ex.Message);
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+            catch (Exception ex)
+            {
+                var test = ex.GetType();
+                return StatusCode(500, "Internal server error");
+            }
 
+            return CreatedAtRoute("GetRessourceType", new { id = ressourceType.Id.ToString() }, ressourceType);
         }
 
         // PUT: api/RessourceType/5

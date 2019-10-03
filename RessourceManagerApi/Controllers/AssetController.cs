@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.Services.Interfaces;
 using RessourceManagerApi.Exceptions.Asset;
-using test_mongo_auth.Services;
+
 
 namespace test_mongo_auth.Controllers
 {
@@ -11,22 +13,26 @@ namespace test_mongo_auth.Controllers
     [ApiController]
     public class AssetController : ControllerBase
     {
-        private readonly AssetService _assetService;
+        private readonly IAssetService _assetService;
 
-        public AssetController(AssetService assetService)
+        public AssetController(IAssetService assetService)
         {
             _assetService = assetService;
         }
 
 
         [HttpGet]
-        public ActionResult<List<Asset>> Get() =>
-            _assetService.Get();
+        public async Task<ActionResult<List<Asset>>> Get()
+        {
+            var list = await _assetService.Get();
+            return list;
+        }
+            
 
         [HttpGet("{id:length(24)}", Name = "GetAsset")]
-        public ActionResult<Asset> Get(string id)
+        public async Task<ActionResult<Asset>> Get(string id)
         {
-            var asset = _assetService.Get(id);
+            var asset = await _assetService.Get(id);
 
             if (asset == null)
             {
@@ -75,7 +81,8 @@ namespace test_mongo_auth.Controllers
                 }
                 try
                 {
-                    _assetService.Update(id, assetIn);
+                     assetIn.Id = id;  // if asset comes without an id 
+                    _assetService.Update(assetIn);
                 }
                 catch (Exception ex)
                 {
@@ -89,9 +96,9 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var asset = _assetService.Get(id);
+            var asset = await _assetService.Get(id);
 
             if (asset == null)
             {

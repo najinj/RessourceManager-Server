@@ -18,10 +18,10 @@ namespace RessourceManager.Core.Repositories
             DbSet = _context.GetCollection<TEntity>(typeof(TEntity).Name);
         }
 
-        public virtual void Add(TEntity obj)
-        {
+        public async virtual Task Add(TEntity obj)
+        {                  
             _context.AddCommand(() => DbSet.InsertOneAsync(obj));
-            _context.SaveChanges();
+            var result = await _context.SaveChanges();                               
         }
 
         public virtual async Task<TEntity> GetById(Guid id)

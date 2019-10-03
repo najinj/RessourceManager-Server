@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RessourceManager.Core.Context;
+using RessourceManager.Core.Helpers;
+using RessourceManager.Core.Middlewares;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Repositories;
 using RessourceManager.Core.Repositories.Interfaces;
@@ -134,6 +136,7 @@ namespace test_mongo_auth
             app.UseCors("MyPolicy");
             app.UseHttpsRedirection();
             app.UseAuthentication();
+            app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseMvc();
            // CreateUserRoles(services).Wait();
         }
@@ -171,7 +174,8 @@ namespace test_mongo_auth
 
             services.AddSingleton<IMongoContext, MongoContext>();
             services.AddSingleton<IRessourceTypeRepository, RessourceTypeRepository>();
-            services.AddScoped<IRessourceTypeService,RessourceTypeService>();           
+            services.AddScoped<IRessourceTypeService,RessourceTypeService>();
+            services.AddTransient<IErrorHandler, ErrorHandler>();
         }
     }
 }
