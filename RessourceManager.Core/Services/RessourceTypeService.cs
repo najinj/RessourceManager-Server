@@ -1,8 +1,9 @@
 ﻿using MongoDB.Driver;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RessourceManager.Core.Exceptions.RessourceType;
 using RessourceManager.Core.Helpers;
 using RessourceManager.Core.Models.V1;
-using RessourceManager.Core.Repositories;
 using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Core.Services.Interfaces;
 using System;
@@ -32,7 +33,7 @@ namespace RessourceManager.Core.Services
 
         public async Task<RessourceType> Get(string id)
         {
-            var ressourceType = await _ressourceTypeRepository.GetById(Guid.Parse(id));
+            var ressourceType = await _ressourceTypeRepository.GetById(id);
             return ressourceType;
         }
 
@@ -46,32 +47,42 @@ namespace RessourceManager.Core.Services
         {
             try
             {
-                ressourceTypeIn.Count = 0; // Make sure the count is 0 at creation
                 await _ressourceTypeRepository.Add(ressourceTypeIn);               
             }
             catch(MongoWriteException mwx)
             {
                 if (mwx.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
-                    var regex = @"/\{.*\:\{.*\:.*\}\}/g";
-                    Match result = Regex.Match(mwx.Message, regex);
-
-                    var field = mwx.Message.Split(".$")[1];
-                    // now we have `email_1 dup key`
-                    field = field.Split(" dup key")[0];
-                    field = field.Substring(0, field.LastIndexOf('_')); // returns email
-
+                    var pattern = @"\{(?:[^{*}])*\}";
+                    Match result = Regex.Match(mwx.Message, pattern);  // get the dublicated feild from the string error msg 
+                    JObject duplicatedField = JsonConvert.DeserializeObject<JObject>(result.Value); // parse it  to get the field 
                     throw new RessourceTypeRepositoryException(string.Format(_errorHandler.GetMessage(ErrorMessagesEnum.DuplicateKey),
-                       nameof(RessourceType), field));
+                       nameof(RessourceType), duplicatedField.First.Path), duplicatedField.First.Path);
                 }
             }
             return ressourceTypeIn;
         }
 
-        public void Update(RessourceType ressourceTypeIn) => _ressourceTypeRepository.Update(ressourceTypeIn);
+        public void Update(RessourceType ressourceTypeIn) {
+            try
+            {
+                _ressourceTypeRepository.Update(ressourceTypeIn);
+            }
+            catch (MongoWriteException mwx)
+            {
+                if (mwx.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                {
+                    var pattern = @"\{(?:[^{*}])*\}";
+                    Match result = Regex.Match(mwx.Message, pattern);  // get the dublicated feild from the string error msg 
+                    JObject duplicatedField = JsonConvert.DeserializeObject<JObject>(result.Value); // parse it  to get the field 
+                    throw new RessourceTypeRepositoryException(string.Format(_errorHandler.GetMessage(ErrorMessagesEnum.DuplicateKey),
+                       nameof(RessourceType), duplicatedField.First.Path), duplicatedField.First.Path);
+                }
+            }
+        } 
 
         
         public void Remove(string id) =>
-            _ressourceTypeRepository.Remove(Guid.Parse(id));
+            _ressourceTypeRepository.Remove(id);
     }
 }

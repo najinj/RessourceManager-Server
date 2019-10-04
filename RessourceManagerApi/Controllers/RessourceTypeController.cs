@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Linq;
 using Newtonsoft.Json;
 using RessourceManager.Core.Exceptions.RessourceType;
+using System.Net;
 
 namespace test_mongo_auth.Controllers
 {
@@ -69,25 +70,29 @@ namespace test_mongo_auth.Controllers
         //  [Authorize(Roles = "Admin")]
         //[Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<RessourceType>> Create(RessourceType ressourceType)
+        public async Task<ActionResult<RessourceType>> Create(RessourceTypeViewModel ressourceTypeIn)
         {
             if (!ModelState.IsValid)
                  return BadRequest(new ValidationProblemDetails(ModelState));
+            var ressourceType = new RessourceType
+            {
+                Description = ressourceTypeIn.Description,
+                Name = ressourceTypeIn.Name,
+                Type = ressourceTypeIn.Type
+            };
             try
             {
                await _ressourceTypeService.Create(ressourceType);
             }
             catch (RessourceTypeRepositoryException ex)
             {
-                ModelState.AddModelError("Name", ex.Message);
+                ModelState.AddModelError(ex.Field, ex.Message);
                 return BadRequest(new ValidationProblemDetails(ModelState));
             }
             catch (Exception ex)
             {
-                var test = ex.GetType();
                 return StatusCode(500, "Internal server error");
             }
-
             return CreatedAtRoute("GetRessourceType", new { id = ressourceType.Id.ToString() }, ressourceType);
         }
 
@@ -95,26 +100,23 @@ namespace test_mongo_auth.Controllers
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, RessourceTypeViewModel ressourceTypeIn)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            var ressourceTypeToUpdate = await _ressourceTypeService.Get(id);
+            if (ressourceTypeToUpdate == null)
+                return NotFound();
+            try
             {
-                var ressourceTypeToUpdate = await _ressourceTypeService.Get(id);
-                if (ressourceTypeToUpdate == null)
-                    return NotFound();
-                try
-                {
-                    ressourceTypeToUpdate.Type = ressourceTypeIn.Type;
-                    ressourceTypeToUpdate.Name = ressourceTypeIn.Name;
-                    ressourceTypeToUpdate.Description = ressourceTypeIn.Description;
-                    _ressourceTypeService.Update(ressourceTypeToUpdate);
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-
-                return CreatedAtRoute("GetRessourceType", new { id = ressourceTypeIn.Id.ToString() }, ressourceTypeIn);
+                ressourceTypeToUpdate.Type = ressourceTypeIn.Type;
+                ressourceTypeToUpdate.Name = ressourceTypeIn.Name;
+                ressourceTypeToUpdate.Description = ressourceTypeIn.Description;
+                _ressourceTypeService.Update(ressourceTypeToUpdate);
             }
-            return BadRequest(new ValidationProblemDetails(ModelState));
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+            return CreatedAtRoute("GetRessourceType", new { id = ressourceTypeIn.Id.ToString() }, ressourceTypeIn);           
         }
 
         // DELETE: api/ApiWithActions/5

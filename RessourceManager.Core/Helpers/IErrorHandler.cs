@@ -22,6 +22,7 @@ namespace RessourceManager.Core.Helpers
         AuthCannotUpdate = 7,
         AuthNotValidInformations = 8,
         AuthCannotRetrieveToken = 9,
-        DuplicateKey = 10
+        DuplicateKey = 10,
+        NotFound = 11
     }
 }

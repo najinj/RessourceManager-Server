@@ -172,10 +172,10 @@ namespace test_mongo_auth
             services.AddSingleton<IRessourceDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<RessourceDatabaseSettings>>().Value);
 
-            services.AddSingleton<IMongoContext, MongoContext>();
-            services.AddSingleton<IRessourceTypeRepository, RessourceTypeRepository>();
-            services.AddScoped<IRessourceTypeService,RessourceTypeService>();
-            services.AddTransient<IErrorHandler, ErrorHandler>();
+            services.AddScoped<IMongoContext, MongoContext>();
+            services.AddTransient<IRessourceTypeRepository, RessourceTypeRepository>();
+            services.AddTransient<IRessourceTypeService,RessourceTypeService>();
+            services.AddScoped<IErrorHandler, ErrorHandler>();
         }
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ServiceStack;
+using MongoDB.Bson;
 
 namespace RessourceManager.Core.Repositories
 {
@@ -24,10 +25,10 @@ namespace RessourceManager.Core.Repositories
             var result = await _context.SaveChanges();                               
         }
 
-        public virtual async Task<TEntity> GetById(Guid id)
+        public virtual async Task<TEntity> GetById(string id)
         {
-            var data = await DbSet.FindAsync(Builders<TEntity>.Filter.Eq("_id", id));
-            return data.SingleOrDefault();
+            var data = await DbSet.FindAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(id)));
+            return data.FirstOrDefault();
         }
 
         public virtual async Task<IEnumerable<TEntity>> GetAll()
@@ -41,7 +42,7 @@ namespace RessourceManager.Core.Repositories
             _context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", obj.GetId()), obj));
         }
 
-        public virtual void Remove(Guid id) => _context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", id)));
+        public virtual void Remove(string id) => _context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(id))));
 
         public void Dispose()
         {

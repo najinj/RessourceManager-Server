@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RessourceManager.Core.Models.V1
 {
-    public enum RType { Space, Asset };
+    public enum RType { Space = 1, Asset = 2 };
     public class RessourceType
     {
         [BsonId]

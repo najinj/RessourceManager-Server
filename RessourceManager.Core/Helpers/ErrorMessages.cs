@@ -39,6 +39,8 @@ namespace RessourceManager.Core.Helpers
                     return "Cannot retrieve token";
                 case ErrorMessagesEnum.DuplicateKey:
                     return "A {0} with the same {1} already exists";
+                case ErrorMessagesEnum.NotFound:
+                    return "An {} with id {} doesn't exist";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }

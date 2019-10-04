@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using RessourceManager.Core.Exceptions.RessourceType;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Services.Interfaces;
-using RessourceManagerApi.Exceptions.RessourceType;
-using RessourceManagerApi.Exceptions.Space;
+using RessourceManager.Core.Exceptions.Space;
+using RessourceManager.Core.Exceptions.Asset;
 
 namespace test_mongo_auth.Controllers
 {
@@ -15,12 +15,10 @@ namespace test_mongo_auth.Controllers
     public class SpaceController : ControllerBase
     {
         private readonly ISpaceService _spaceService;
-        private readonly IAssetService _assetService;
 
-        public SpaceController(ISpaceService spaceService, IAssetService assetService)
+        public SpaceController(ISpaceService spaceService)
         {
             _spaceService = spaceService;
-            _assetService = assetService;
         }
 
 
@@ -53,21 +51,24 @@ namespace test_mongo_auth.Controllers
                 {
                     var result = _spaceService.Create(space);
                 }
-                catch (RessourceTypeNotFoundException e)
+                catch (RessourceTypeRepositoryException ex)
                 {
-                    ModelState.AddModelError("SpaceTypeId", e.Message);
+                    ModelState.AddModelError(ex.Field, ex.Message);
                     return BadRequest(new ValidationProblemDetails(ModelState));
                 }
-                catch(SpaceDuplicateKeyException ex)
+                catch(SpaceRepositoryException ex)
                 {
-                    ModelState.AddModelError("Name", ex.Message);
+                    ModelState.AddModelError(ex.Field, ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+                catch (AssetRepositoryException ex)
+                {
+                    ModelState.AddModelError(ex.Field, ex.Message);
                     return BadRequest(new ValidationProblemDetails(ModelState));
                 }
                 return CreatedAtRoute("GetSpace", new { id = space.Id.ToString() }, space);
             }
-            return BadRequest(new ValidationProblemDetails(ModelState));
-
-          
+            return BadRequest(new ValidationProblemDetails(ModelState)); 
         }
 
         [HttpPut("{id:length(24)}")]
@@ -86,9 +87,15 @@ namespace test_mongo_auth.Controllers
                     spaceIn.Id = id;
                     _spaceService.Update(spaceIn);
                 }
-                catch (Exception ex)
+                catch (RessourceTypeRepositoryException ex)
                 {
-                    return StatusCode(500, "Internal server error");
+                    ModelState.AddModelError(ex.Field, ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+                catch (AssetRepositoryException ex)
+                {
+                    ModelState.AddModelError(ex.Field, ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
                 }
                 return CreatedAtRoute("GetSpace", new { id = spaceIn.Id.ToString() }, spaceIn);
             }
@@ -113,58 +120,49 @@ namespace test_mongo_auth.Controllers
             {
                 return StatusCode(500, "Internal server error");
             }
-
-            return NoContent();
+            return Ok();
         }
 
         [HttpGet("{assetId}/{spaceId}")]
         public async Task<IActionResult> RemoveAssetFromSpace(string assetId,string spaceId)
         {
-            var spaceIn = await _spaceService.Get(spaceId);
-            var assetIn = await _assetService.Get(assetId);
-            if (spaceIn == null)
-                return NotFound("Space Not found");
-            if(assetIn == null)
-                return NotFound("Asset Not found");
-            var assetToRemove = spaceIn.assests.Where(asset => asset.Id == assetId).FirstOrDefault();
-            if (assetToRemove == null)
-                return NotFound($"Asset Not found in {spaceIn.Name} ");
-            spaceIn.assests.Remove(assetToRemove);
+            Space space;
             try
             {
-               // if (assetIn.Status == Status.Chained) 
-                    assetIn.Status = Status.Unchained;  // if we remove a chained asset from space it becomes unchained and would be possible to reserve it           
-                _spaceService.Update(spaceIn);
-                _assetService.Update(assetIn); // updating the status of the asset 
+                space = await _spaceService.RemoveAssetFromSpace(assetId, spaceId);
+                if(space == null)
+                    return StatusCode(500, "Internal server error");
             }
-            catch (Exception ex)
+            catch (SpaceRepositoryException ex)
             {
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, ex.Message);
             }
-            return Ok(spaceIn);
+            catch (AssetRepositoryException ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            return Ok(space);
         }
 
         [HttpGet("{assetId}/{spaceId}")]
         public async Task<IActionResult> AddAssetToSpace(string assetId, string spaceId)
         {
-            var spaceIn = await _spaceService.Get(spaceId);
-            var assetIn = await _assetService.Get(assetId);
-            if (spaceIn == null)
-                return NotFound("Space Not found");
-            if (assetIn == null)
-                return NotFound("Asset Not found");
-            spaceIn.assests.Add(assetIn);
+            Space space;
             try
             {
-                 assetIn.Status = Status.Chained;
-                _spaceService.Update(spaceIn);
-                _assetService.Update(assetIn); // updating the status of the asset 
+                space = await _spaceService.AddAssetToSpace(assetId, spaceId);
+                if (space == null)
+                    return StatusCode(500, "Internal server error");
             }
-            catch(Exception ex)
+            catch (SpaceRepositoryException ex)
             {
-                return StatusCode(500, "Internal server error");
-            }   
-            return Ok(spaceIn);
+                return StatusCode(500, ex.Message);
+            }
+            catch (AssetRepositoryException ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            return Ok(space);
         }
     }
 }
