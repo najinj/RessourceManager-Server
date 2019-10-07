@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using RessourceManager.Core.Exceptions.Asset;
+using RessourceManager.Core.Exceptions.RessourceType;
+using RessourceManager.Core.Exceptions.Space;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Services.Interfaces;
-using RessourceManagerApi.Exceptions.Asset;
 
 
 namespace test_mongo_auth.Controllers
@@ -48,21 +50,30 @@ namespace test_mongo_auth.Controllers
         {
             if (ModelState.IsValid)
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    _assetService.Create(asset);
+                    try
+                    {
+                        var result = _assetService.Create(asset);
+                    }
+                    catch (RessourceTypeRepositoryException ex)
+                    {
+                        ModelState.AddModelError(ex.Field, ex.Message);
+                        return BadRequest(new ValidationProblemDetails(ModelState));
+                    }
+                    catch (SpaceRepositoryException ex)
+                    {
+                        ModelState.AddModelError(ex.Field, ex.Message);
+                        return BadRequest(new ValidationProblemDetails(ModelState));
+                    }
+                    catch (AssetRepositoryException ex)
+                    {
+                        ModelState.AddModelError(ex.Field, ex.Message);
+                        return BadRequest(new ValidationProblemDetails(ModelState));
+                    }
+                    return CreatedAtRoute("GetSpace", new { id = asset.Id.ToString() }, asset);
                 }
-                catch(AssetDuplicateKeyException ex)
-                {
-                    ModelState.AddModelError("Name", ex.Message);
-                    return BadRequest(new ValidationProblemDetails(ModelState));
-                }
-                catch(Exception ex)
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-
-                return CreatedAtRoute("GetAsset", new { id = asset.Id.ToString() }, asset);
+                return BadRequest(new ValidationProblemDetails(ModelState));
             }
             
             return BadRequest(new ValidationProblemDetails(ModelState));
@@ -81,14 +92,20 @@ namespace test_mongo_auth.Controllers
                 }
                 try
                 {
-                     assetIn.Id = id;  // if asset comes without an id 
+                    assetIn.Id = id;
                     _assetService.Update(assetIn);
                 }
-                catch (Exception ex)
+                catch (RessourceTypeRepositoryException ex)
                 {
-                    return StatusCode(500, "Internal server error");
+                    ModelState.AddModelError(ex.Field, ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
                 }
-                return CreatedAtRoute("GetAsset", new { id = assetIn.Id.ToString() }, assetIn);
+                catch (AssetRepositoryException ex)
+                {
+                    ModelState.AddModelError(ex.Field, ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+                return CreatedAtRoute("GetSpace", new { id = assetIn.Id.ToString() }, assetIn);
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
 
@@ -98,16 +115,21 @@ namespace test_mongo_auth.Controllers
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var asset = await _assetService.Get(id);
+            var space = await _assetService.Get(id);
 
-            if (asset == null)
+            if (space == null)
             {
                 return NotFound();
             }
-
-            _assetService.Remove(asset.Id);
-
-            return NoContent();
+            try
+            {
+                _assetService.Remove(space.Id);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+            return Ok();
         }
 
     }

@@ -4,15 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.ViewModels.RessourceType;
-using RessourceManagerApi.Exceptions.RessourceType;
-using RessourceManager.Core.Services;
 using RessourceManager.Core.Services.Interfaces;
 using RessourceManager.Core.Helpers;
-using System.Net.Http;
-using System.Linq;
-using Newtonsoft.Json;
 using RessourceManager.Core.Exceptions.RessourceType;
-using System.Net;
 
 namespace test_mongo_auth.Controllers
 {
