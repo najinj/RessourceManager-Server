@@ -7,14 +7,13 @@ using RessourceManager.Core.Exceptions.Space;
 using RessourceManager.Core.Helpers;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Repositories.Interfaces;
-using System;
+using RessourceManager.Core.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace RessourceManager.Core.Services.Interfaces
+namespace RessourceManager.Core.Services
 {
     public class SpaceService : ISpaceService
     {

@@ -1,9 +1,9 @@
 ﻿
 
 
-using RessourceManager.Core.Repositories.Interfaces;
 
-namespace RessourceManager.Core.Repositories
+
+namespace RessourceManager.Infrastructure.DatabaseSettings
 {
     public class RessourceDatabaseSettings : IRessourceDatabaseSettings
     {

@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 
 
-namespace RessourceManager.Core.Middlewares
+namespace RessourceManager.Api.Infrastructure.Middlewares
 {
     public class ErrorHandlingMiddleware
     {

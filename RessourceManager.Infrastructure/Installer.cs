@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace RessourceManager.Infrastructure
 {
-    public class Class1
+    class Installer
     {
-
     }
 }

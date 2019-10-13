@@ -1,15 +1,14 @@
-﻿using Microsoft.Extensions.Configuration;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using RessourceManager.Core.Repositories.Interfaces;
+using RessourceManager.Infrastructure.DatabaseSettings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RessourceManager.Core.Context
+namespace RessourceManager.Infrastructure.Context
 {
     public class MongoContext : IMongoContext
     {
@@ -69,7 +68,8 @@ namespace RessourceManager.Core.Context
 
         public void Dispose()
         {
-            Session.Dispose();
+            if(Session != null)
+                Session.Dispose();
             GC.SuppressFinalize(this);
         }
 

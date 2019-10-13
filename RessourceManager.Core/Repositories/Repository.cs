@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ServiceStack;
 using MongoDB.Bson;
+using RessourceManager.Infrastructure.Context;
 
 namespace RessourceManager.Core.Repositories
 {

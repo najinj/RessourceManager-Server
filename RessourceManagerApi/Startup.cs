@@ -3,8 +3,6 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
-using AspNetCore.Identity.MongoDbCore.Extensions;
-using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,14 +12,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using RessourceManager.Core.Context;
+using RessourceManager.Infrastructure.Context;
+using RessourceManager.Infrastructure.DatabaseSettings;
 using RessourceManager.Core.Helpers;
-using RessourceManager.Core.Middlewares;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Repositories;
 using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Core.Services;
 using RessourceManager.Core.Services.Interfaces;
+using RessourceManager.Api.Infrastructure.Middlewares;
+using RessourceManagerApi.Infrastructure;
 
 namespace test_mongo_auth
 {
@@ -117,6 +117,7 @@ namespace test_mongo_auth
 
             
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            Installer.ConfigureServices(services);
             RegisterServices(services);
 
         }
@@ -172,10 +173,11 @@ namespace test_mongo_auth
             services.AddSingleton<IRessourceDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<RessourceDatabaseSettings>>().Value);
 
-            services.AddScoped<IMongoContext, MongoContext>();
-            services.AddTransient<IRessourceTypeRepository, RessourceTypeRepository>();
-            services.AddTransient<IRessourceTypeService,RessourceTypeService>();
-            services.AddScoped<IErrorHandler, ErrorHandler>();
+          /*  services.AddSingleton<MongoContext, MongoContext>();
+            services.AddSingleton<IRessourceTypeRepository, RessourceTypeRepository>();
+            services.AddSingleton<IRessourceTypeService,RessourceTypeService>();
+            services.AddSingleton<IErrorHandler, ErrorHandler>();
+            */
         }
     }
 }
