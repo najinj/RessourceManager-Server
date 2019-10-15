@@ -38,9 +38,10 @@ namespace RessourceManager.Core.Repositories
             return all.ToList();
         }
 
-        public virtual void Update(TEntity obj)
+        public virtual async void Update(TEntity obj)
         {
-            _context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", obj.GetId()), obj));
+            _context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(obj.GetId().ToString())), obj));
+            var result = await _context.SaveChanges();
         }
 
         public virtual void Remove(string id) => _context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(id))));
