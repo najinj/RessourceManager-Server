@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.Services.Interfaces;
 using RessourceManager.Core.ViewModels.Authentication;
-using RessourceManagerApi.Services;
 
 namespace RessourceManagerApi.Controllers
 {
@@ -16,8 +16,8 @@ namespace RessourceManagerApi.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly EmailSenderService _emailService;
-        public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, EmailSenderService emailService)
+        private readonly IEmailSenderService _emailService;
+        public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IEmailSenderService emailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;

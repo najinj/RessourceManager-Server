@@ -15,7 +15,6 @@
   <ItemGroup>
     <Compile Remove="Controllers\PostsController.cs" />
     <Compile Remove="Controllers\ReservationController.cs" />
-    <Compile Remove="Controllers\UserController.cs" />
     <Compile Remove="Models\ApplicationUser.cs" />
   </ItemGroup>
 
