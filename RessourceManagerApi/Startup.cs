@@ -13,6 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Api.Infrastructure.Middlewares;
+using AspNetCore.Identity.MongoDbCore.Infrastructure;
+using AspNetCore.Identity.MongoDbCore.Extensions;
+using RessourceManager.Infrastructure.DatabaseSettings;
 
 namespace test_mongo_auth
 {
@@ -44,39 +47,8 @@ namespace test_mongo_auth
                 options.SuppressUseValidationProblemDetailsForInvalidModelStateResponses = false;
             });
 
-           /* 
 
-            services.AddSingleton<IRessourceDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<RessourceDatabaseSettings>>().Value);
-
-            var mongoDbIdentityConfiguration = new MongoDbIdentityConfiguration
-            {
-                MongoDbSettings = new MongoDbSettings
-                {
-                    ConnectionString = "mongodb://localhost:27017",
-                    DatabaseName = "RessourceManagmentDb"
-                },
-                IdentityOptionsAction = options =>
-                {
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequireLowercase = true;
-                    options.Password.RequireUppercase = true;
-                    options.Password.RequireNonAlphanumeric = true;
-                    options.Password.RequireDigit = true;
-
-                    // Lockout settings
-                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                    options.Lockout.MaxFailedAccessAttempts = 10;
-
-                    // ApplicationUser settings
-                    options.User.RequireUniqueEmail = true;
-                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_";
-                }
-            };
-            services.ConfigureMongoDbIdentity<ApplicationUser, ApplicationRole, Guid>(mongoDbIdentityConfiguration);
-            */
-
-
+            
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
 
@@ -111,6 +83,7 @@ namespace test_mongo_auth
             RessourceManagerApi.Infrastructure.Installer.ConfigureServices(services);
             RessourceManager.Infrastructure.Installer.RegisterServices(services, Configuration);
             // RegisterServices(services);
+            ConfigureDbIdentity(services);
 
         }
 
@@ -154,6 +127,40 @@ namespace test_mongo_auth
             ApplicationUser user = await UserManager.FindByEmailAsync("naji.ensat@gmailcom");
             if(user != null)
                  await UserManager.AddToRoleAsync(user, "Admin");
+        }
+
+        private void ConfigureDbIdentity(IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var ressourceDatabaseSettingsService = serviceProvider.GetService<IRessourceDatabaseSettings>();
+                   
+            var mongoDbIdentityConfiguration = new MongoDbIdentityConfiguration
+            {
+                MongoDbSettings = new MongoDbSettings
+                {
+                    ConnectionString = ressourceDatabaseSettingsService.ConnectionString,
+                    DatabaseName = ressourceDatabaseSettingsService.DatabaseName
+                },
+                IdentityOptionsAction = options =>
+                {
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequireDigit = true;
+
+                    // Lockout settings
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                    options.Lockout.MaxFailedAccessAttempts = 10;
+
+                    // ApplicationUser settings
+                    options.User.RequireUniqueEmail = true;
+                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_";
+                }
+            };
+
+            services.ConfigureMongoDbIdentity<ApplicationUser, ApplicationRole, Guid>(mongoDbIdentityConfiguration);
+
         }
     }
 }
