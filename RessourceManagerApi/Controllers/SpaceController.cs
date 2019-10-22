@@ -43,13 +43,13 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Space> Create(Space space)
+        public async Task<ActionResult<Space>> Create(Space space)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var result = _spaceService.Create(space);
+                    var result = await _spaceService.Create(space);
                 }
                 catch (RessourceTypeRepositoryException ex)
                 {
