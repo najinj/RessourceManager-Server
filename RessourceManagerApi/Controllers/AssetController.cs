@@ -46,7 +46,7 @@ namespace test_mongo_auth.Controllers
 
 
         [HttpPost]
-        public ActionResult<Asset> Create(Asset asset)
+        public async Task<ActionResult<Asset>> Create(Asset asset)
         {
             if (ModelState.IsValid)
             {
@@ -54,7 +54,7 @@ namespace test_mongo_auth.Controllers
                 {
                     try
                     {
-                        var result = _assetService.Create(asset);
+                        var result = await _assetService.Create(asset);
                     }
                     catch (RessourceTypeRepositoryException ex)
                     {
@@ -80,11 +80,11 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, Asset assetIn)
+        public async Task<IActionResult> Update(string id, Asset assetIn)
         {
             if (ModelState.IsValid)
             {
-                var space = _assetService.Get(id);
+                var space = await _assetService.Get(id);
 
                 if (space == null)
                 {
@@ -93,7 +93,7 @@ namespace test_mongo_auth.Controllers
                 try
                 {
                     assetIn.Id = id;
-                    _assetService.Update(assetIn);
+                    await _assetService.Update(assetIn);
                 }
                 catch (RessourceTypeRepositoryException ex)
                 {
