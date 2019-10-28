@@ -86,7 +86,7 @@ namespace RessourceManager.Core.Services
             return assetIn;
         }
 
-        public async void Update(Asset assetIn)
+        public async Task Update(Asset assetIn)
         {
             var ressourceTypeIn = await _ressourceTypeRepository.GetById(assetIn.AssetTypeId);
             if (ressourceTypeIn == null)
