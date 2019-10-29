@@ -38,7 +38,7 @@ namespace RessourceManager.Core.Repositories
             return all.ToList();
         }
 
-        public virtual async void Update(TEntity obj)
+        public virtual async Task Update(TEntity obj)
         {
             _context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(obj.GetId().ToString())), obj));
             var result = await _context.SaveChanges();

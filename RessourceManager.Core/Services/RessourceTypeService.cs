@@ -63,10 +63,10 @@ namespace RessourceManager.Core.Services
             return ressourceTypeIn;
         }
 
-        public void Update(RessourceType ressourceTypeIn) {
+        public async Task<RessourceType> Update(RessourceType ressourceTypeIn) {
             try
             {
-                _ressourceTypeRepository.Update(ressourceTypeIn);
+                await _ressourceTypeRepository.Update(ressourceTypeIn);
             }
             catch (MongoWriteException mwx)
             {
@@ -79,6 +79,7 @@ namespace RessourceManager.Core.Services
                        nameof(RessourceType), duplicatedField.First.Path), duplicatedField.First.Path);
                 }
             }
+            return ressourceTypeIn;
         } 
 
         

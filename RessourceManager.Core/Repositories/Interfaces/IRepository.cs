@@ -10,7 +10,7 @@ namespace RessourceManager.Core.Repositories.Interfaces
         Task Add(TEntity obj);
         Task<TEntity> GetById(string id);
         Task<IEnumerable<TEntity>> GetAll();
-        void Update(TEntity obj);
+        Task Update(TEntity obj);
         void Remove(string id);
     }
 }
