@@ -104,7 +104,12 @@ namespace test_mongo_auth.Controllers
                 ressourceTypeToUpdate.Type = ressourceTypeIn.Type;
                 ressourceTypeToUpdate.Name = ressourceTypeIn.Name;
                 ressourceTypeToUpdate.Description = ressourceTypeIn.Description;
-                _ressourceTypeService.Update(ressourceTypeToUpdate);
+                await _ressourceTypeService.Update(ressourceTypeToUpdate);
+            }
+            catch (RessourceTypeRepositoryException ex)
+            {
+                ModelState.AddModelError(ex.Field, ex.Message);
+                return BadRequest(new ValidationProblemDetails(ModelState));
             }
             catch (Exception ex)
             {
