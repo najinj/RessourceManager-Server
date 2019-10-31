@@ -83,7 +83,7 @@ namespace RessourceManager.Core.Services
         } 
 
         
-        public void Remove(string id) =>
-            _ressourceTypeRepository.Remove(id);
+        public async Task Remove(string id) =>
+            await _ressourceTypeRepository.Remove(id);
     }
 }

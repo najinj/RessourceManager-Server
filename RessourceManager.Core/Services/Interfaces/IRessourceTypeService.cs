@@ -13,7 +13,7 @@ namespace RessourceManager.Core.Services.Interfaces
         Task<List<RessourceType>> GetByType(int type);
         Task<RessourceType> Create(RessourceType ressourceTypeIn);
         Task<RessourceType> Update(RessourceType ressourceTypeIn);
-        void Remove(string id);
+        Task Remove(string id);
 
     }
 }
