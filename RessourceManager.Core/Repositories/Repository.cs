@@ -44,7 +44,11 @@ namespace RessourceManager.Core.Repositories
             var result = await _context.SaveChanges();
         }
 
-        public virtual void Remove(string id) => _context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(id))));
+        public virtual async Task Remove(string id)
+        {
+            _context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(id))));
+            var result = await _context.SaveChanges();
+        } 
 
         public void Dispose()
         {

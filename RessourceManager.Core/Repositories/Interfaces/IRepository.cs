@@ -11,6 +11,6 @@ namespace RessourceManager.Core.Repositories.Interfaces
         Task<TEntity> GetById(string id);
         Task<IEnumerable<TEntity>> GetAll();
         Task Update(TEntity obj);
-        void Remove(string id);
+        Task Remove(string id);
     }
 }
