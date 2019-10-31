@@ -129,9 +129,9 @@ namespace test_mongo_auth.Controllers
                 return NotFound();
             }
 
-            _ressourceTypeService.Remove(ressourceType.Id);
+            await _ressourceTypeService.Remove(ressourceType.Id);
 
-            return NoContent();
+            return Ok();
         }
     }
 }
