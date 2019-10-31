@@ -98,8 +98,8 @@ namespace RessourceManager.Core.Services
                          nameof(RessourceType), spaceIn.SpaceTypeId), nameof(spaceIn.SpaceTypeId));
 
             ressourceTypeIn.Count--; // Decreassing count when removing an asset
-            _ressourceTypeRepository.Update(ressourceTypeIn);
-            _spaceRepository.Remove(spaceIn.Id);
+            await _ressourceTypeRepository.Update(ressourceTypeIn);
+            await _spaceRepository.Remove(spaceIn.Id);
         }
 
         public async Task<Space> RemoveAssetFromSpace(string assetId, string spaceId) {
