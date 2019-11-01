@@ -72,11 +72,11 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, Space spaceIn)
+        public async Task<IActionResult> Update(string id, Space spaceIn)
         {
             if (ModelState.IsValid)
             {
-                var space = _spaceService.Get(id);
+                var space = await _spaceService.Get(id);
 
                 if (space == null)
                 {
@@ -85,9 +85,14 @@ namespace test_mongo_auth.Controllers
                 try
                 {
                     spaceIn.Id = id;
-                    _spaceService.Update(spaceIn);
+                    await _spaceService.Update(spaceIn);
                 }
                 catch (RessourceTypeRepositoryException ex)
+                {
+                    ModelState.AddModelError(ex.Field, ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+                catch (SpaceRepositoryException ex)
                 {
                     ModelState.AddModelError(ex.Field, ex.Message);
                     return BadRequest(new ValidationProblemDetails(ModelState));
