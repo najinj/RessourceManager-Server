@@ -54,7 +54,7 @@ namespace RessourceManager.Core.Services
             try
             {
                 ressourceTypeIn.Count++; // Increamenting count when adding an asset
-                _ressourceTypeRepository.Update(ressourceTypeIn);
+                await _ressourceTypeRepository.Update(ressourceTypeIn);
                 await _spaceRepository.Add(spaceIn);
 
             }
@@ -72,10 +72,10 @@ namespace RessourceManager.Core.Services
             return spaceIn;
         }
 
-        public void Update(Space spaceIn) {
+        public async Task Update(Space spaceIn) {
             try
             {
-                _spaceRepository.Update(spaceIn);
+               await _spaceRepository.Update(spaceIn);
             }
             catch (MongoWriteException mwx)
             {
@@ -90,7 +90,7 @@ namespace RessourceManager.Core.Services
             }
 
         }
-        public async void Remove(Space spaceIn)
+        public async Task Remove(Space spaceIn)
         {
             var ressourceTypeIn = await _ressourceTypeRepository.GetById(spaceIn.SpaceTypeId);
             if (ressourceTypeIn == null)
@@ -98,8 +98,8 @@ namespace RessourceManager.Core.Services
                          nameof(RessourceType), spaceIn.SpaceTypeId), nameof(spaceIn.SpaceTypeId));
 
             ressourceTypeIn.Count--; // Decreassing count when removing an asset
-            _ressourceTypeRepository.Update(ressourceTypeIn);
-            _spaceRepository.Remove(spaceIn.Id);
+            await _ressourceTypeRepository.Update(ressourceTypeIn);
+            await _spaceRepository.Remove(spaceIn.Id);
         }
 
         public async Task<Space> RemoveAssetFromSpace(string assetId, string spaceId) {
@@ -122,8 +122,8 @@ namespace RessourceManager.Core.Services
             {
                 // if (assetIn.Status == Status.Chained) 
                 assetIn.Status = Status.Unchained;  // if we remove a chained asset from space it becomes unchained and would be possible to reserve it           
-                _spaceRepository.Update(spaceIn);
-                _assetRepository.Update(assetIn); // updating the status of the asset 
+                await _spaceRepository.Update(spaceIn);
+                await _assetRepository.Update(assetIn); // updating the status of the asset 
             }
             catch (MongoWriteException ex)
             {
@@ -144,8 +144,8 @@ namespace RessourceManager.Core.Services
             try
             {
                 assetIn.Status = Status.Chained;
-                _spaceRepository.Update(spaceIn);
-                _assetRepository.Update(assetIn); // updating the status of the asset 
+                await _spaceRepository.Update(spaceIn);
+                await _assetRepository.Update(assetIn); // updating the status of the asset 
             }
             catch (MongoWriteException ex)
             {
@@ -155,11 +155,11 @@ namespace RessourceManager.Core.Services
         }
 
 
-        public async void Remove(string id)
+        public async Task Remove(string id)
         {
             var spaceIn = await _spaceRepository.GetById(id);
             if (spaceIn != null)
-                Remove(spaceIn);
+                await Remove(spaceIn);
         }
     }
 }
