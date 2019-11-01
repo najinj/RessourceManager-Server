@@ -102,7 +102,7 @@ namespace RessourceManager.Core.Services
             }
             try
             {
-                _assetRepository.Update(assetIn);
+                await _assetRepository.Update(assetIn);
             }
             catch (MongoWriteException mwx)
             {
