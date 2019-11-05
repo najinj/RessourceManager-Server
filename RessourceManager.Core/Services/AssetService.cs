@@ -155,5 +155,11 @@ namespace RessourceManager.Core.Services
                 Remove(assetIn);
         }
 
+        public async Task<List<Asset>> Get(List<string> ids)
+        {
+            var assets = await _assetRepository.Get(ids);
+            return assets.ToList();
+        }
+
     }
 }
