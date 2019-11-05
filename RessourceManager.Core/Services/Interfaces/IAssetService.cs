@@ -12,7 +12,7 @@ namespace RessourceManager.Core.Services.Interfaces
         Task<Asset> Get(string id);
         Task<Asset> Create(Asset assetIn);
         Task Update(Asset assetIn);
-        void Remove(string id);
+        Task Remove(string id);
         Task<List<Asset>> Get(List<string> ids);
     }
 }

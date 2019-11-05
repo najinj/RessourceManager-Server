@@ -120,7 +120,7 @@ namespace RessourceManager.Core.Services
         }
 
 
-        public async void Remove(Asset assetIn)
+        public async Task Remove(Asset assetIn)
         {
             var ressourceTypeIn = await _ressourceTypeRepository.GetById(assetIn.AssetTypeId);
             if (ressourceTypeIn == null)
