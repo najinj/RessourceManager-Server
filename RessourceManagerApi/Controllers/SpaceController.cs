@@ -7,6 +7,8 @@ using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Services.Interfaces;
 using RessourceManager.Core.Exceptions.Space;
 using RessourceManager.Core.Exceptions.Asset;
+using RessourceManager.Core.ViewModels.Space;
+using System.Linq;
 
 namespace test_mongo_auth.Controllers
 {
@@ -15,10 +17,12 @@ namespace test_mongo_auth.Controllers
     public class SpaceController : ControllerBase
     {
         private readonly ISpaceService _spaceService;
+        private readonly IAssetService _assetService;
 
-        public SpaceController(ISpaceService spaceService)
+        public SpaceController(ISpaceService spaceService,IAssetService assetService)
         {
             _spaceService = spaceService;
+            _assetService = assetService;
         }
 
 
@@ -72,7 +76,7 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
-        public async Task<IActionResult> Update(string id, Space spaceIn)
+        public async Task<IActionResult> Update(string id, SpaceViewModel spaceIn)
         {
             if (ModelState.IsValid)
             {
@@ -84,8 +88,16 @@ namespace test_mongo_auth.Controllers
                 }
                 try
                 {
-                    spaceIn.Id = id;
-                    await _spaceService.Update(spaceIn);
+                    if (spaceIn.assets.Any())
+                    {
+                        var assets = await _assetService.Get(spaceIn.assets);
+                        space.assests = assets;
+                    }                       
+                    space.Capacity = spaceIn.Capacity;
+                    space.Name = spaceIn.Name;
+                    space.SpaceTypeId = spaceIn.SpaceTypeId;
+                    space.Tags = spaceIn.Tags;
+                    await _spaceService.Update(space);
                 }
                 catch (RessourceTypeRepositoryException ex)
                 {
