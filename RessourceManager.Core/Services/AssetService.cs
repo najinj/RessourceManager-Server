@@ -148,7 +148,7 @@ namespace RessourceManager.Core.Services
         }
             
 
-        public async void Remove(string id)
+        public async Task Remove(string id)
         {
             var assetIn = await _assetRepository.GetById(id);
             if (assetIn != null)
