@@ -68,7 +68,7 @@ namespace RessourceManager.Core.Services
                     assetIn.Status = Status.Unchained;
 
                 ressourceTypeIn.Count++; // Increamenting count when adding an asset
-                _ressourceTypeRepository.Update(ressourceTypeIn);
+                await _ressourceTypeRepository.Update(ressourceTypeIn);
                 await _assetRepository.Add(assetIn);
             }
             catch (MongoWriteException mwx)
@@ -130,8 +130,8 @@ namespace RessourceManager.Core.Services
             ressourceTypeIn.Count--; // Decreassing count when removing an asset
             try
             {
-                _ressourceTypeRepository.Update(ressourceTypeIn);
-                _assetRepository.Remove(assetIn.Id);
+                await _ressourceTypeRepository.Update(ressourceTypeIn);
+                await _assetRepository.Remove(assetIn.Id);
             }
             catch (MongoWriteException mwx)
             {
@@ -152,7 +152,7 @@ namespace RessourceManager.Core.Services
         {
             var assetIn = await _assetRepository.GetById(id);
             if (assetIn != null)
-                Remove(assetIn);
+                await Remove(assetIn);
         }
 
         public async Task<List<Asset>> Get(List<string> ids)
