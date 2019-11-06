@@ -47,12 +47,24 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Space>> Create(Space space)
+        public async Task<ActionResult<Space>> Create(SpaceViewModel spaceIn)
         {
             if (ModelState.IsValid)
             {
-                try
+                var space = new Space
                 {
+                    Capacity = spaceIn.Capacity,
+                    Name = spaceIn.Name,
+                    SpaceTypeId = spaceIn.SpaceTypeId,
+                    Tags = spaceIn.Tags
+                };
+                try
+                {               
+                    if (spaceIn.assets.Any())
+                    {
+                        var assets = await _assetService.Get(spaceIn.assets);
+                        space.assests = assets;
+                    }              
                     var result = await _spaceService.Create(space);
                 }
                 catch (RessourceTypeRepositoryException ex)
