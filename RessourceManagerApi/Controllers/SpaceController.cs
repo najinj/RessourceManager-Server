@@ -114,7 +114,7 @@ namespace test_mongo_auth.Controllers
                     ModelState.AddModelError(ex.Field, ex.Message);
                     return BadRequest(new ValidationProblemDetails(ModelState));
                 }
-                return CreatedAtRoute("GetSpace", new { id = spaceIn.Id.ToString() }, spaceIn);
+                return CreatedAtRoute("GetSpace", new { id = space.Id.ToString() }, space);
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
 
