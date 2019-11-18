@@ -16,6 +16,8 @@ namespace RessourceManager.Core.Models.V1
         [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid ResourceId")]
         [Required]
         public string ResourceId { get; set; }
+
+        public string PeriodicId { get; set; }
         [Required]
         public RType ResourceType { get; set; }
         public string Title { get; set; }
@@ -30,6 +32,7 @@ namespace RessourceManager.Core.Models.V1
         public DateTime EndTime { get; set; }
         public DateTime StartRecur { get; set; }// When DaysOfWeek is set , StartRecur is used to get the start Date of the recuring event 
         public DateTime EndRecur { get; set; }
+
 
     }
 }
