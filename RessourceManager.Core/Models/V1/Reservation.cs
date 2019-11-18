@@ -13,12 +13,11 @@ namespace RessourceManager.Core.Models.V1
         public string Id { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid SpaceId")]
-        public string SpaceId { get; set; }
-
-        [BsonRepresentation(BsonType.ObjectId)]
-        [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid AssetId")]
-        public string AssetId { get; set; }
+        [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid ResourceId")]
+        [Required]
+        public string ResourceId { get; set; }
+        [Required]
+        public RType ResourceType { get; set; }
         public string Title { get; set; }
 
         [Required]
