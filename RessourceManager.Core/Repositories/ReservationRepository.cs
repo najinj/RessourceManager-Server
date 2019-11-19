@@ -27,7 +27,7 @@ namespace RessourceManager.Core.Repositories
             {
                 for (DateTime startPeriodic = start, endPeriodic = end; startPeriodic <= periodicEndDate; startPeriodic.AddDays(7),endPeriodic.AddDays(7))
                 {
-                    var temp = await GetReservationsByInterval(start, end);
+                    var temp = await GetReservationsByInterval(startPeriodic, endPeriodic);
                     if (temp.Exists(reservation => reservation.ResourceId == spaceId))
                         return false;
                 }
