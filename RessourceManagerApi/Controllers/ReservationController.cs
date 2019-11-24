@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cronos;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.Services.Interfaces;
+using RessourceManager.Core.ViewModels.Reservation;
 using RessourceManagerApi.Exceptions.Reservation;
-using RessourceManagerApi.Services;
+
 
 namespace RessourceManagerApi.Controllers
 {
@@ -11,44 +14,71 @@ namespace RessourceManagerApi.Controllers
     [ApiController]
     public class ReservationController : ControllerBase
     {
-        private readonly ReservationService _reservationService;
-        public ReservationController(ReservationService reservationService)
+        private readonly IReservationService _reservationService;
+        public ReservationController(IReservationService reservationService)
         {
             _reservationService = reservationService;
         }
         // GET: api/Reservation
         [HttpGet]
-        public ActionResult<List<Reservation>> Get() =>
-            _reservationService.Get();
+        public ActionResult<List<Reservation>> Get() => throw new NotImplementedException();
+          //  _reservationService.Get();
 
         // GET: api/Reservation/5
         [HttpGet("{id}", Name = "GetReservation")]
         public ActionResult<Reservation> Get(string id) =>
-            _reservationService.Get(id);
+            throw new NotImplementedException();
 
         // POST: api/Reservation
         [HttpPost]
-        public ActionResult Post(Reservation reservation)
+        public ActionResult Post(ReservationViewModel reservationIn)
         {
-            if (string.IsNullOrEmpty(reservation.AssetId) && string.IsNullOrEmpty(reservation.SpaceId))
-            {
-                var validationMessage = "Please provide Asset or Space.";
-                ModelState.AddModelError("AssetId", validationMessage);
-                ModelState.AddModelError("SpaceId", validationMessage);
-            }
-
-            if (!string.IsNullOrEmpty(reservation.AssetId) && !string.IsNullOrEmpty(reservation.SpaceId))
-            {
-                var validationMessage = "Please provide either Asset or Space.";
-                ModelState.AddModelError("AssetId", validationMessage);
-                ModelState.AddModelError("SpaceId", validationMessage);
-            }
             if (ModelState.IsValid)
             {
-
                 try
-                {
-                    _reservationService.Create(reservation);
+                {             
+                    if (string.IsNullOrWhiteSpace(reservationIn.CronoExpression)){
+                        var reservation = new Reservation
+                        {
+                            Start = reservationIn.Start,
+                            End = reservationIn.End,
+                            ResourceId = reservationIn.ResourceId,
+                            UserId = reservationIn.UserId,
+                            Title = reservationIn.Title,
+                            PeriodicId = string.Empty,
+                            ResourceType = reservationIn.ResourceType,
+                        };
+                        _reservationService.Add(reservation);
+                    }
+                    else
+                    {                       
+                        var expression = CronExpression.Parse(reservationIn.CronoExpression);
+                        var occurrences = expression.GetOccurrences(
+                            reservationIn.Start,
+                            reservationIn.End,
+                            fromInclusive: true,
+                            toInclusive: true);
+                        if (occurrences == null)
+                            return null;
+                        var reservations = new List<Reservation>();
+                        foreach (var startTime in occurrences)
+                        {
+                            var endTime = new DateTime(startTime.Year, startTime.Month, startTime.Day, reservationIn.End.Hour, reservationIn.End.Minute, 0);
+                            reservations.Add(new Reservation
+                            {
+                                Start = startTime,
+                                End = endTime,
+                                ResourceId = reservationIn.ResourceId,
+                                UserId = reservationIn.UserId,
+                                Title = reservationIn.Title,
+                                PeriodicId = string.Empty,
+                                ResourceType = reservationIn.ResourceType,
+                            }
+                            );
+                        }
+                        _reservationService.Add(reservations);
+                    }
+                    
                 }
                 catch (ReservationDuplicateKeyException ex)
                 {
@@ -61,7 +91,7 @@ namespace RessourceManagerApi.Controllers
                     return StatusCode(500, "Internal server error");
                 }
 
-                return CreatedAtRoute("GetReservation", new { id = reservation.Id.ToString() }, reservation);
+              //  return CreatedAtRoute("GetReservation", new { id = reservationIn..ToString() }, reservationIn);
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
 
@@ -71,6 +101,8 @@ namespace RessourceManagerApi.Controllers
         [HttpPut("{id:length(24)}")]
         public ActionResult Put(string id, Reservation reservationIn)
         {
+            return null;
+            /*
             if (string.IsNullOrEmpty(reservationIn.AssetId) && string.IsNullOrEmpty(reservationIn.SpaceId))
             {
                 var validationMessage = "Please provide Asset or Space.";
@@ -103,6 +135,7 @@ namespace RessourceManagerApi.Controllers
                 return NoContent();
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
+            */
         }
 
         // DELETE: api/ApiWithActions/5
@@ -115,7 +148,7 @@ namespace RessourceManagerApi.Controllers
             {
                 return NotFound();
             }
-            _reservationService.Remove(reservation.Id);
+           // _reservationService.Remove(reservation.Id);
 
             return NoContent();
         }
