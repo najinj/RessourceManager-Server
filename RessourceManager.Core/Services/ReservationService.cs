@@ -61,9 +61,13 @@ namespace RessourceManager.Core.Services
             return reservation;
         }
 
-        public async Task Remove(string id)
+        public async Task Remove(string reservationId,string userId,bool isAdmin)
         {
-            await _reservationRepository.Remove(id);
+            var reservation = await Get(reservationId);
+            if (reservation.UserId != userId && !isAdmin)
+                throw new ReservationServiceException(string.Format(_errorHandler.GetMessage(ErrorMessagesEnum.AuthCannotDelete),nameof(Reservation)),
+                                new string[] { nameof(Reservation.UserId) });
+            await _reservationRepository.Remove(reservationId);
         }
 
         public async Task RemovePeriodicReservations(string periodicId)
