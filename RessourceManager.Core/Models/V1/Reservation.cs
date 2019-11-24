@@ -12,7 +12,6 @@ namespace RessourceManager.Core.Models.V1
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        [BsonRepresentation(BsonType.ObjectId)]
         [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid ResourceId")]
         [Required]
         public string UserId { get; set; }
