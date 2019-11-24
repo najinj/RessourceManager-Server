@@ -12,7 +12,7 @@ namespace RessourceManager.Core.Repositories.Interfaces
         Task<List<Reservation>> GetReservationsByInterval(DateTime start, DateTime end);
         Task Add(IEnumerable<Reservation> reservationsIn);
         Task RemovePeriodicReservations(string periodicId);
-        Task<bool> CheckAvailability(DateTime start, DateTime end, string spaceId);
+        Task<bool> CheckResourceAvailability(DateTime start, DateTime end, string spaceId);
         Task<List<Reservation>> GetPeriodicReservations(string periodicId);
         Task<List<Reservation>> GetUserReservations(string userId);
     }

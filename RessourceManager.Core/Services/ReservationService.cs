@@ -22,7 +22,7 @@ namespace RessourceManager.Core.Services
 
         public async Task<Reservation> Add(Reservation reservationIn)
         {
-            var availability = await _reservationRepository.CheckAvailability(reservationIn.Start, reservationIn.End, reservationIn.ResourceId);
+            var availability = await _reservationRepository.CheckResourceAvailability(reservationIn.Start, reservationIn.End, reservationIn.ResourceId);
             if(!availability)
                 throw new ReservationServiceException(_errorHandler.GetMessage(ErrorMessagesEnum.NotAvailable)
                         , new string[] { nameof(Reservation.Start), nameof(Reservation.End) });
@@ -34,7 +34,7 @@ namespace RessourceManager.Core.Services
         {
             foreach (var reservation in reservationsIn)
             {
-                var availability = await _reservationRepository.CheckAvailability(reservation.Start, reservation.End, reservation.ResourceId);
+                var availability = await _reservationRepository.CheckResourceAvailability(reservation.Start, reservation.End, reservation.ResourceId);
                 if(!availability)
                     throw new ReservationServiceException(_errorHandler.GetMessage(ErrorMessagesEnum.NotAvailable)
                        , new string[] { nameof(Reservation.Start), nameof(Reservation.End) });

@@ -14,7 +14,7 @@ namespace RessourceManager.Core.Repositories
         {
 
         }
-        public async Task<bool> CheckAvailability(DateTime start, DateTime end, string spaceId)
+        public async Task<bool> CheckResourceAvailability(DateTime start, DateTime end, string spaceId)
         {
                 var reservations = await GetReservationsByInterval(start, end);
                 if(reservations.Exists(reservation=>reservation.ResourceId == spaceId))
