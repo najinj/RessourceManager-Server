@@ -5,34 +5,41 @@ using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Core.Services.Interfaces;
 using System;
+using RessourceManager.Core.Exceptions.Reservation;
+using RessourceManager.Core.Helpers;
 
 namespace RessourceManager.Core.Services
 {
     public class ReservationService : IReservationService
     {
         private readonly IReservationRepository _reservationRepository;
-        public ReservationService(IReservationRepository reservationRepository)
+        private readonly IErrorHandler _errorHandler;
+        public ReservationService(IReservationRepository reservationRepository, IErrorHandler errorHandler)
         {
             _reservationRepository = reservationRepository;
+            _errorHandler = errorHandler;
         }
 
         public async Task<Reservation> Add(Reservation reservationIn)
         {
             var availability = await _reservationRepository.CheckAvailability(reservationIn.Start, reservationIn.End, reservationIn.ResourceId);
-            if(availability)
-               await _reservationRepository.Add(reservationIn);
+            if(!availability)
+                throw new ReservationServiceException(_errorHandler.GetMessage(ErrorMessagesEnum.NotAvailable)
+                        , new string[] { nameof(Reservation.Start), nameof(Reservation.End) });
+            await _reservationRepository.Add(reservationIn);
             return reservationIn;
         }
 
         public async Task<IEnumerable<Reservation>> Add(IEnumerable<Reservation> reservationsIn)
         {
-            var availability = false;
             foreach (var reservation in reservationsIn)
             {
-                availability = await _reservationRepository.CheckAvailability(reservation.Start, reservation.End, reservation.ResourceId);
+                var availability = await _reservationRepository.CheckAvailability(reservation.Start, reservation.End, reservation.ResourceId);
+                if(!availability)
+                    throw new ReservationServiceException(_errorHandler.GetMessage(ErrorMessagesEnum.NotAvailable)
+                       , new string[] { nameof(Reservation.Start), nameof(Reservation.End) });
             }
-            if (availability)
-                await _reservationRepository.Add(reservationsIn);
+            await _reservationRepository.Add(reservationsIn);
             return reservationsIn;
         }
 
