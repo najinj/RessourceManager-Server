@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\PostsController.cs" />
-    <Compile Remove="Models\ApplicationUser.cs" />
   </ItemGroup>
 
   <ItemGroup>
