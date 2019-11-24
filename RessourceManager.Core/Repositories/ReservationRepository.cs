@@ -14,25 +14,12 @@ namespace RessourceManager.Core.Repositories
         {
 
         }
-        public async Task<bool> CheckAvailability(DateTime start, DateTime end, DateTime? periodicEndDate, string spaceId)
+        public async Task<bool> CheckAvailability(DateTime start, DateTime end, string spaceId)
         {
-            if (!periodicEndDate.HasValue)
-            {
                 var reservations = await GetReservationsByInterval(start, end);
                 if(reservations.Exists(reservation=>reservation.ResourceId == spaceId))
                     return false;
-                return true;
-            }
-            else
-            {
-                for (DateTime startPeriodic = start, endPeriodic = end; startPeriodic <= periodicEndDate; startPeriodic.AddDays(7),endPeriodic.AddDays(7))
-                {
-                    var temp = await GetReservationsByInterval(startPeriodic, endPeriodic);
-                    if (temp.Exists(reservation => reservation.ResourceId == spaceId))
-                        return false;
-                }
-                return true;
-            }        
+                return true;              
         }
 
         public async Task<List<Reservation>> Get(DateTime start)

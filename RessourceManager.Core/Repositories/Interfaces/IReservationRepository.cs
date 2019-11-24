@@ -12,6 +12,6 @@ namespace RessourceManager.Core.Repositories.Interfaces
         Task<List<Reservation>> GetReservationsByInterval(DateTime start, DateTime end);
         Task Add(IEnumerable<Reservation> reservationsIn);
         Task RemovePeriodicReservations(string periodicId);
-        Task<bool> CheckAvailability(DateTime start, DateTime end, DateTime? periodicEndTime, string spaceId);
+        Task<bool> CheckAvailability(DateTime start, DateTime end, string spaceId);
     }
 }
