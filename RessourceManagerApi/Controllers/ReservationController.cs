@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Cronos;
 using Microsoft.AspNetCore.Mvc;
+using RessourceManager.Core.Exceptions.Reservation;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Services.Interfaces;
 using RessourceManager.Core.ViewModels.Reservation;
-using RessourceManagerApi.Exceptions.Reservation;
 
 
 namespace RessourceManagerApi.Controllers
@@ -21,18 +24,26 @@ namespace RessourceManagerApi.Controllers
         }
         // GET: api/Reservation
         [HttpGet]
-        public ActionResult<List<Reservation>> Get() => throw new NotImplementedException();
-          //  _reservationService.Get();
+        public async Task<ActionResult<List<Reservation>>> Get() => 
+            await _reservationService.Get();
 
         // GET: api/Reservation/5
         [HttpGet("{id}", Name = "GetReservation")]
-        public ActionResult<Reservation> Get(string id) =>
-            throw new NotImplementedException();
+        public async Task<ActionResult<Reservation>> Get(string Id) => 
+            await _reservationService.Get(Id);
+
+
+        public async Task<ActionResult<dynamic>> Availability(DateTime start,DateTime end,RType resourceType)
+        {
+            var freeResources = await _reservationService.Availability(start, end, resourceType);
+            return freeResources;
+        } 
 
         // POST: api/Reservation
         [HttpPost]
         public ActionResult Post(ReservationViewModel reservationIn)
         {
+            var userId = User.Claims.Where(claim=>claim.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
             if (ModelState.IsValid)
             {
                 try
@@ -43,7 +54,7 @@ namespace RessourceManagerApi.Controllers
                             Start = reservationIn.Start,
                             End = reservationIn.End,
                             ResourceId = reservationIn.ResourceId,
-                            UserId = reservationIn.UserId,
+                            UserId = userId,
                             Title = reservationIn.Title,
                             PeriodicId = string.Empty,
                             ResourceType = reservationIn.ResourceType,
@@ -70,7 +81,7 @@ namespace RessourceManagerApi.Controllers
                                 Start = startTime,
                                 End = endTime,
                                 ResourceId = reservationIn.ResourceId,
-                                UserId = reservationIn.UserId,
+                                UserId = userId,
                                 Title = reservationIn.Title,
                                 PeriodicId = periodicId,
                                 ResourceType = reservationIn.ResourceType,
@@ -81,9 +92,10 @@ namespace RessourceManagerApi.Controllers
                     }
                     
                 }
-                catch (ReservationDuplicateKeyException ex)
+                catch (ReservationServiceException ex)
                 {
-                    ModelState.AddModelError("Name", ex.Message);
+                    foreach(var field in ex.Fields)
+                        ModelState.AddModelError(field, ex.Message);
                     return BadRequest(new ValidationProblemDetails(ModelState));
                 }
                 catch (Exception ex)
@@ -141,17 +153,51 @@ namespace RessourceManagerApi.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
-        {
-            var reservation = _reservationService.Get(id);
-
-            if (reservation == null)
+        public async Task<IActionResult> Remove(string id)
+        {          
+            try
             {
-                return NotFound();
+                var reservation = await _reservationService.Get(id);
+                if (reservation == null)
+                {
+                    return NotFound();
+                }
+                var userId = User.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
+                var isAdmin = User.Claims.Where(claim => claim.Type == ClaimTypes.Role).FirstOrDefault().Value.Contains("Admin");
+                await _reservationService.Remove(reservation.Id, userId, isAdmin);
             }
-           // _reservationService.Remove(reservation.Id);
-
-            return NoContent();
+            catch(ReservationServiceException ex)
+            {
+                foreach (var field in ex.Fields)
+                    ModelState.AddModelError(field, ex.Message);
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+            return Ok();
+        }
+        [HttpDelete("{id:length(24)}")]
+        public async Task<IActionResult> RemovePeriodicReservations(string periodicId)
+        {
+            try
+            {
+                var userId = User.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
+                var isAdmin = User.Claims.Where(claim => claim.Type == ClaimTypes.Role).FirstOrDefault().Value.Contains("Admin");
+                await _reservationService.RemovePeriodicReservations(periodicId,userId,isAdmin);
+            }
+            catch (ReservationServiceException ex)
+            {
+                foreach (var field in ex.Fields)
+                    ModelState.AddModelError(field, ex.Message);
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+            return Ok();
         }
     }
 }
