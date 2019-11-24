@@ -18,7 +18,7 @@ namespace RessourceManager.Core.Services
 
         public async Task<Reservation> Add(Reservation reservationIn)
         {
-            var availability = await _reservationRepository.CheckAvailability(reservationIn.Start, reservationIn.End, null, reservationIn.ResourceId);
+            var availability = await _reservationRepository.CheckAvailability(reservationIn.Start, reservationIn.End, reservationIn.ResourceId);
             if(availability)
                await _reservationRepository.Add(reservationIn);
             return reservationIn;
@@ -29,7 +29,7 @@ namespace RessourceManager.Core.Services
             var availability = false;
             foreach (var reservation in reservationsIn)
             {
-                availability = await _reservationRepository.CheckAvailability(reservation.Start, reservation.End, null, reservation.ResourceId);
+                availability = await _reservationRepository.CheckAvailability(reservation.Start, reservation.End, reservation.ResourceId);
             }
             if (availability)
                 await _reservationRepository.Add(reservationsIn);
