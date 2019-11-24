@@ -9,6 +9,7 @@ namespace RessourceManager.Core.Services.Interfaces
     public interface IReservationService
     {
         Task<List<Reservation>> Get();
+        Task<List<Reservation>> Get(DateTime start);
         Task<Reservation> Get(string reservationIn);
         Task<Reservation> Add(Reservation reservationIn);
         Task<IEnumerable<Reservation>> Add(IEnumerable<Reservation> reservationsIn);
