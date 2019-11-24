@@ -13,10 +13,18 @@ namespace RessourceManager.Core.Services
     public class ReservationService : IReservationService
     {
         private readonly IReservationRepository _reservationRepository;
+        private readonly IAssetRepository _assetRepository;
+        private readonly ISpaceRepository _spaceRepository;
         private readonly IErrorHandler _errorHandler;
-        public ReservationService(IReservationRepository reservationRepository, IErrorHandler errorHandler)
+        public ReservationService(IReservationRepository reservationRepository, 
+                                  IAssetRepository assetRepository,
+                                  IErrorHandler errorHandler,
+                                  ISpaceRepository spaceRepository)
         {
             _reservationRepository = reservationRepository;
+            _errorHandler = errorHandler;
+            _assetRepository = assetRepository;
+            _spaceRepository = spaceRepository;
             _errorHandler = errorHandler;
         }
 
@@ -41,6 +49,24 @@ namespace RessourceManager.Core.Services
             }
             await _reservationRepository.Add(reservationsIn);
             return reservationsIn;
+        }
+
+        public async Task<dynamic> Availability(DateTime start, DateTime end, RType resourceType)
+        {
+            var reservations = await _reservationRepository.GetReservationsByInterval(start, end);
+            var resourceIds = reservations.Where(reservation => reservation.ResourceType == resourceType).Select(reservation=> reservation.ResourceId).ToList();
+            if(resourceType == RType.Space)
+            {
+                var spaces = await _spaceRepository.GetAll();
+                var freeSpaces = spaces.Where(space => !resourceIds.Contains(space.Id)).ToList();
+                return freeSpaces;
+            }
+            else
+            {
+                var assets = await _assetRepository.GetAll();
+                var freeAssets = assets.Where(asset => !resourceIds.Contains(asset.Id)).ToList();
+                return freeAssets;
+            }
         }
 
         public async Task<List<Reservation>> Get(DateTime start)

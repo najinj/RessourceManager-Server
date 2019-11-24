@@ -16,6 +16,7 @@ namespace RessourceManager.Core.Services.Interfaces
         Task Update(Reservation reservationIn);
         Task Remove(string reservationId,string userId,bool isAdmin);
         Task RemovePeriodicReservations(string periodicId, string userId, bool isAdmin);
+        Task<dynamic> Availability(DateTime start, DateTime end, RType resourceType);
 
     }
 }
