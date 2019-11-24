@@ -10,7 +10,7 @@ namespace RessourceManager.Core.Services.Interfaces
     {
         Task<List<Reservation>> Get();
         Task<Reservation> Get(string reservationIn);
-        Task<Reservation> Create(Reservation reservationIn);
+        Task<Reservation> Add(Reservation reservationIn);
         Task Update(Reservation reservationIn);
         Task Remove(string id);
         Task RemovePeriodicReservations(string periodicId);
