@@ -14,5 +14,6 @@ namespace RessourceManager.Core.Repositories.Interfaces
         Task RemovePeriodicReservations(string periodicId);
         Task<bool> CheckAvailability(DateTime start, DateTime end, string spaceId);
         Task<List<Reservation>> GetPeriodicReservations(string periodicId);
+        Task<List<Reservation>> GetUserReservations(string userId);
     }
 }

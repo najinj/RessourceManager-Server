@@ -65,5 +65,11 @@ namespace RessourceManager.Core.Repositories
             var reservations = await DbSet.FindAsync(reservation=>reservation.PeriodicId == periodicId);
             return reservations.ToList();
         }
+
+        public async Task<List<Reservation>> GetUserReservations(string userId)
+        {
+            var reservations = await DbSet.FindAsync(reservation => reservation.UserId == userId);
+            return reservations.ToList();
+        }
     }
 }
