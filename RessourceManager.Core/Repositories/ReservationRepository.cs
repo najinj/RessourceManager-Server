@@ -66,5 +66,11 @@ namespace RessourceManager.Core.Repositories
         {
             var result = await DbSet.DeleteManyAsync(reservation => reservation.PeriodicId == periodicId);
         }
+
+
+        public async Task Add(IEnumerable<Reservation> reservationsIn)
+        {
+             await DbSet.InsertManyAsync(reservationsIn);
+        }
     }
 }
