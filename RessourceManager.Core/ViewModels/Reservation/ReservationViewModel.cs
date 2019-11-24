@@ -14,11 +14,6 @@ namespace RessourceManager.Core.ViewModels.Reservation
         [BsonRepresentation(BsonType.ObjectId)]
         [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid ResourceId")]
         [Required]
-        public string UserId { get; set; }
-
-        [BsonRepresentation(BsonType.ObjectId)]
-        [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid ResourceId")]
-        [Required]
         public string ResourceId { get; set; }
         
         [Required]
@@ -32,8 +27,6 @@ namespace RessourceManager.Core.ViewModels.Reservation
         public DateTime End { get; set; }
 
         public string CronoExpression { get; set; }
-
-
 
     }
 }
