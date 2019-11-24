@@ -14,11 +14,11 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\PostsController.cs" />
-    <Compile Remove="Controllers\ReservationController.cs" />
     <Compile Remove="Models\ApplicationUser.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Cronos" Version="0.7.0" />
     <PackageReference Include="MailKit" Version="2.3.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
