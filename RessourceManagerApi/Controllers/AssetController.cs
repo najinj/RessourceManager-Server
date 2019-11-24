@@ -123,7 +123,7 @@ namespace test_mongo_auth.Controllers
             }
             try
             {
-                _assetService.Remove(space.Id);
+                await _assetService.Remove(space.Id);
             }
             catch (Exception ex)
             {
