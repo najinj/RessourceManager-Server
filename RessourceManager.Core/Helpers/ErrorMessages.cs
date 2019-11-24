@@ -41,6 +41,8 @@ namespace RessourceManager.Core.Helpers
                     return "A {0} with the same {1} already exists";
                 case ErrorMessagesEnum.NotFound:
                     return "An {} with id {} doesn't exist";
+                case ErrorMessagesEnum.NotAvailable:
+                    return "The selected Resource is not available durring this period";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
