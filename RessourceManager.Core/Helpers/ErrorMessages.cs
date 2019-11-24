@@ -27,7 +27,7 @@ namespace RessourceManager.Core.Helpers
                     return "Cannot create user";
 
                 case ErrorMessagesEnum.AuthCannotDelete:
-                    return "Cannot delete user";
+                    return "User Cannot delete this {0}";
 
                 case ErrorMessagesEnum.AuthCannotUpdate:
                     return "Cannot update user";
@@ -37,12 +37,16 @@ namespace RessourceManager.Core.Helpers
 
                 case ErrorMessagesEnum.AuthCannotRetrieveToken:
                     return "Cannot retrieve token";
+
                 case ErrorMessagesEnum.DuplicateKey:
                     return "A {0} with the same {1} already exists";
+
                 case ErrorMessagesEnum.NotFound:
                     return "An {} with id {} doesn't exist";
+
                 case ErrorMessagesEnum.NotAvailable:
                     return "The selected Resource is not available durring this period";
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
