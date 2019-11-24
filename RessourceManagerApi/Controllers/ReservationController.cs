@@ -61,6 +61,7 @@ namespace RessourceManagerApi.Controllers
                         if (occurrences == null)
                             return null;
                         var reservations = new List<Reservation>();
+                        var periodicId = Guid.NewGuid().ToString();
                         foreach (var startTime in occurrences)
                         {
                             var endTime = new DateTime(startTime.Year, startTime.Month, startTime.Day, reservationIn.End.Hour, reservationIn.End.Minute, 0);
@@ -71,7 +72,7 @@ namespace RessourceManagerApi.Controllers
                                 ResourceId = reservationIn.ResourceId,
                                 UserId = reservationIn.UserId,
                                 Title = reservationIn.Title,
-                                PeriodicId = string.Empty,
+                                PeriodicId = periodicId,
                                 ResourceType = reservationIn.ResourceType,
                             }
                             );
