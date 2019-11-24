@@ -1,9 +1,10 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Core.Services.Interfaces;
+using System;
 
 namespace RessourceManager.Core.Services
 {
@@ -35,24 +36,32 @@ namespace RessourceManager.Core.Services
             return reservationsIn;
         }
 
-        public Task<List<Reservation>> Get()
+        public async Task<List<Reservation>> Get(DateTime start)
         {
-            throw new System.NotImplementedException();
+            var reservations = await _reservationRepository.Get(start);
+            return reservations;
         }
 
-        public Task<Reservation> Get(string reservationIn)
+        public async Task<List<Reservation>> Get()
         {
-            throw new System.NotImplementedException();
+            var reservations = await _reservationRepository.GetAll();
+            return reservations.ToList();
         }
 
-        public Task Remove(string id)
+        public async Task<Reservation> Get(string reservationId)
         {
-            throw new System.NotImplementedException();
+            var reservation = await _reservationRepository.GetById(reservationId);
+            return reservation;
         }
 
-        public Task RemovePeriodicReservations(string periodicId)
+        public async Task Remove(string id)
         {
-            throw new System.NotImplementedException();
+            await _reservationRepository.Remove(id);
+        }
+
+        public async Task RemovePeriodicReservations(string periodicId)
+        {
+            await _reservationRepository.RemovePeriodicReservations(periodicId);
         }
 
         public Task Update(Reservation reservationIn)
