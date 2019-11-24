@@ -59,5 +59,11 @@ namespace RessourceManager.Core.Repositories
         {
              await DbSet.InsertManyAsync(reservationsIn);
         }
+
+        public async Task<List<Reservation>> GetPeriodicReservations(string periodicId)
+        {
+            var reservations = await DbSet.FindAsync(reservation=>reservation.PeriodicId == periodicId);
+            return reservations.ToList();
+        }
     }
 }
