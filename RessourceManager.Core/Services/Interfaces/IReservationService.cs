@@ -15,7 +15,7 @@ namespace RessourceManager.Core.Services.Interfaces
         Task<IEnumerable<Reservation>> Add(IEnumerable<Reservation> reservationsIn);
         Task Update(Reservation reservationIn);
         Task Remove(string reservationId,string userId,bool isAdmin);
-        Task RemovePeriodicReservations(string periodicId);
+        Task RemovePeriodicReservations(string periodicId, string userId, bool isAdmin);
 
     }
 }
