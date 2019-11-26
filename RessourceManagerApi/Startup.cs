@@ -17,9 +17,9 @@ using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using AspNetCore.Identity.MongoDbCore.Extensions;
 using RessourceManager.Infrastructure.DatabaseSettings;
 
-namespace test_mongo_auth
+namespace RessourceManagerApi
 {
-    public class Startup
+    public partial class Startup
     {
         readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
