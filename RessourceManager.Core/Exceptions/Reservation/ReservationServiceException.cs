@@ -4,12 +4,8 @@ namespace RessourceManager.Core.Exceptions.Reservation
 {
     public class ReservationServiceException : Exception
     {
-        public string[] Fields
-        {
-            get => Fields;
-            set { Fields = value; }
-        }
-
+        public string[] Fields { get; set; }
+       
         public ReservationServiceException()
         {
         }
