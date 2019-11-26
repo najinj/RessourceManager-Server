@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "test_mongo_auth": {
+    "RessourceManagerApi": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/values",

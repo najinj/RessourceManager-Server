@@ -10,7 +10,7 @@ using RessourceManager.Core.Exceptions.Asset;
 using RessourceManager.Core.ViewModels.Space;
 using System.Linq;
 
-namespace test_mongo_auth.Controllers
+namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]

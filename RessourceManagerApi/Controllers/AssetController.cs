@@ -9,7 +9,7 @@ using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Services.Interfaces;
 
 
-namespace test_mongo_auth.Controllers
+namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]

@@ -8,7 +8,7 @@ using RessourceManager.Core.Services.Interfaces;
 using RessourceManager.Core.Helpers;
 using RessourceManager.Core.Exceptions.RessourceType;
 
-namespace test_mongo_auth.Controllers
+namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]

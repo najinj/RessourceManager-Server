@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using test_mongo_auth.Helpers;
+using RessourceManagerApi.Helpers;
 using Microsoft.AspNetCore.Cors;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.ViewModels.Authentication;
 
-namespace test_mongo_auth.Controllers
+namespace RessourceManagerApi.Controllers
 {
     [EnableCors("MyPolicy")]
     [Route("api/[controller]/[action]")]
