@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace RessourceManagerApi.TokenProvider
@@ -48,30 +48,21 @@ namespace RessourceManagerApi.TokenProvider
             var username = context.Request.Form["username"];
             var password = context.Request.Form["password"];
 
-            var identity = await _options.IdentityResolver(username, password);
-            if (identity == null)
+            var result = await _options.IdentityResolver(username, password);
+            if (result.identity == null)
             {
-                context.Response.StatusCode = 400;
-                await context.Response.WriteAsync("Invalid username or password.");
+                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                await context.Response.WriteAsync(result.message);
                 return;
             }
 
             var now = DateTime.UtcNow;
 
-
-            var claims = new Claim[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, username),
-                new Claim(JwtRegisteredClaimNames.Jti, await _options.NonceGenerator()),
-                new System.Security.Claims.Claim(JwtRegisteredClaimNames.Iat,
-                    new DateTimeOffset(now).ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
-            };
-
             // Create the JWT and write it to a string
             var jwt = new JwtSecurityToken(
                 issuer: _options.Issuer,
                 audience: _options.Audience,
-                claims: claims,
+                claims: result.identity.Claims,
                 notBefore: now,
                 expires: now.Add(_options.Expiration),
                 signingCredentials: _options.SigningCredentials);
