@@ -1,10 +1,15 @@
 ﻿
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using RessourceManager.Core.Models.V1;
 using RessourceManagerApi.TokenProvider;
 using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
@@ -20,7 +25,9 @@ namespace RessourceManagerApi
 
         private  TokenProviderOptions _tokenProviderOptions;
 
-        private void ConfigureAuth(IServiceCollection services)
+        private IApplicationBuilder _app;
+
+        private void RegisterAuth(IServiceCollection services)
         {
             _signingKey =
                 new SymmetricSecurityKey(
@@ -67,21 +74,54 @@ namespace RessourceManagerApi
                         _tokenValidationParameters);
                 });
 
-
+            
 
 
         }
 
-        private Task<ClaimsIdentity> GetIdentity(string username, string password)
+        private void ConfigureAuth(IApplicationBuilder app)
         {
-            // Don't do this in production, obviously!
-            if (username == "Naji" && password == "Naji")
-            {
-                return Task.FromResult(new ClaimsIdentity(new GenericIdentity(username, "Token"), new Claim[] { }));
-            }
+            _app = app;
+        }
 
-            // Credentials are invalid, or account doesn't exist
-            return Task.FromResult<ClaimsIdentity>(null);
+        private async Task<(ClaimsIdentity identity, string message)> GetIdentity(string username, string password)
+        {
+
+            using (var serviceScope = _app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var userManager = serviceScope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
+                var user = await userManager.FindByEmailAsync(username);
+                var result = userManager.CheckPasswordAsync(user, password).Result;
+
+                if (result && user.Activated)
+                {
+                    var userRoles = await userManager.GetRolesAsync(user);
+                    var claims = new List<Claim>
+                    {
+                        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                        new Claim(JwtRegisteredClaimNames.Sid, user.Id.ToString()),
+                        new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
+                        new Claim(JwtRegisteredClaimNames.Jti, await _tokenProviderOptions.NonceGenerator()),
+                        new Claim(JwtRegisteredClaimNames.Iat,
+                             new DateTimeOffset(DateTime.UtcNow).ToUniversalTime().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+                    };
+
+                    foreach (var userRole in userRoles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, userRole));
+                    }
+
+                    return (new ClaimsIdentity(new GenericIdentity(username, "Token"), claims), string.Empty);
+                    
+                }
+                else if (result && !user.Activated)
+                {
+                    return (null, "Account is not Activated");
+                }
+                else
+                    return (null, "Bad Credentials");
+             
+            }
         }
     }
 }
