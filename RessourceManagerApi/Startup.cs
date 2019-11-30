@@ -15,7 +15,6 @@ using AspNetCore.Identity.MongoDbCore.Extensions;
 using RessourceManager.Infrastructure.DatabaseSettings;
 using RessourceManagerApi.ExtensionMethods;
 
-
 namespace RessourceManagerApi
 {
     public partial class Startup
@@ -44,13 +43,7 @@ namespace RessourceManagerApi
                 options.SuppressUseValidationProblemDetailsForInvalidModelStateResponses = false;
             });
 
-
-
-
-             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
-
-
-
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             
             RessourceManagerApi.Infrastructure.Installer.ConfigureServices(services);
             RessourceManager.Infrastructure.Installer.RegisterServices(services, Configuration);
@@ -58,13 +51,13 @@ namespace RessourceManagerApi
             ConfigureDbIdentity(services);
 
             services.AddMvc();
-            ConfigureAuth(services);
+            RegisterAuth(services);
 
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,IServiceProvider services)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -77,10 +70,10 @@ namespace RessourceManagerApi
             }
             app.UseCors("MyPolicy");
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
-            app.UseHttpsRedirection();
+            ConfigureAuth(app);
+            app.UseHttpsRedirection();           
             app.UseTokenProvider(_tokenProviderOptions);
-            app.UseAuthentication();
-            
+            app.UseAuthentication();          
             app.UseMvc();
            // CreateUserRoles(services).Wait();
         }
