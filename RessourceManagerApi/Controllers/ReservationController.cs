@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -33,6 +34,10 @@ namespace RessourceManagerApi.Controllers
         public async Task<ActionResult<Reservation>> Get(string Id) => 
             await _reservationService.Get(Id);
 
+        // GET: api/Reservation/5
+        [HttpGet("{id}", Name = "GetPeriodicReservations")]
+        public async Task<ActionResult<List<Reservation>>> GetPeriodicReservations(string periodicId) =>
+            await _reservationService.GetPeriodicReservations(periodicId);
 
         public async Task<ActionResult<dynamic>> Availability(DateTime start,DateTime end,RType resourceType)
         {
@@ -42,9 +47,9 @@ namespace RessourceManagerApi.Controllers
 
         // POST: api/Reservation
         [HttpPost]
-        public ActionResult Post(ReservationViewModel reservationIn)
+        public async Task<ActionResult> Create(ReservationViewModel reservationIn)
         {
-            var userId = User.Claims.Where(claim=>claim.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
+            var userId = User.Claims.Where(claim=>claim.Type == JwtRegisteredClaimNames.Sid).FirstOrDefault().Value;
             if (ModelState.IsValid)
             {
                 try
@@ -60,7 +65,8 @@ namespace RessourceManagerApi.Controllers
                             PeriodicId = string.Empty,
                             ResourceType = reservationIn.ResourceType,
                         };
-                        _reservationService.Add(reservation);
+                        await _reservationService.Add(reservation);
+                        return CreatedAtRoute("GetReservation", new { id = reservation.ToString() }, reservation);
                     }
                     else
                     {                       
@@ -89,7 +95,8 @@ namespace RessourceManagerApi.Controllers
                             }
                             );
                         }
-                        _reservationService.Add(reservations);
+                        await _reservationService.Add(reservations);
+                        return CreatedAtRoute("GetPeriodicReservations", new { id = periodicId }, reservations);
                     }
                     
                 }
@@ -104,8 +111,6 @@ namespace RessourceManagerApi.Controllers
                     var test = ex.GetType();
                     return StatusCode(500, "Internal server error");
                 }
-
-              //  return CreatedAtRoute("GetReservation", new { id = reservationIn..ToString() }, reservationIn);
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
 
