@@ -11,6 +11,7 @@ namespace RessourceManager.Core.Services.Interfaces
         Task<List<Reservation>> Get();
         Task<List<Reservation>> Get(DateTime start);
         Task<Reservation> Get(string reservationIn);
+        Task<List<Reservation>> GetPeriodicReservations(string periodicId);
         Task<Reservation> Add(Reservation reservationIn);
         Task<IEnumerable<Reservation>> Add(IEnumerable<Reservation> reservationsIn);
         Task Update(Reservation reservationIn);

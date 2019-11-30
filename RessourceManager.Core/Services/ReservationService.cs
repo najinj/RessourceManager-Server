@@ -87,6 +87,12 @@ namespace RessourceManager.Core.Services
             return reservation;
         }
 
+        public async Task<List<Reservation>> GetPeriodicReservations(string periodicId)
+        {
+            var reservations = await _reservationRepository.GetPeriodicReservations(periodicId);
+            return reservations;
+        }
+
         public async Task Remove(string reservationId,string userId,bool isAdmin)
         {
             var reservation = await Get(reservationId);
