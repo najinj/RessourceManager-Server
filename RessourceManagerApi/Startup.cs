@@ -1,28 +1,25 @@
 ﻿
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Api.Infrastructure.Middlewares;
 using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using AspNetCore.Identity.MongoDbCore.Extensions;
 using RessourceManager.Infrastructure.DatabaseSettings;
+using RessourceManagerApi.ExtensionMethods;
+
 
 namespace RessourceManagerApi
 {
     public partial class Startup
     {
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -48,42 +45,21 @@ namespace RessourceManagerApi
             });
 
 
-            
 
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
 
-            services.AddAuthentication(options =>
-            {
-                //Set default Authentication Schema as Bearer
-                options.DefaultAuthenticateScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(cfg =>
-            {
-                cfg.RequireHttpsMetadata = false;
-                cfg.SaveToken = true;
-                cfg.TokenValidationParameters =
-                       new TokenValidationParameters
-                       {
-                           ValidIssuer = Configuration["JwtIssuer"],
-                           ValidAudience = Configuration["JwtIssuer"],
-                           IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
-                           ClockSkew = TimeSpan.Zero // remove delay of token when expire
-                       };
-            });
+             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
 
 
 
             
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             RessourceManagerApi.Infrastructure.Installer.ConfigureServices(services);
             RessourceManager.Infrastructure.Installer.RegisterServices(services, Configuration);
             // RegisterServices(services);
             ConfigureDbIdentity(services);
+
+            services.AddMvc();
+            ConfigureAuth(services);
+
 
         }
 
@@ -100,9 +76,11 @@ namespace RessourceManagerApi
                 app.UseHsts();
             }
             app.UseCors("MyPolicy");
-            app.UseHttpsRedirection();
-            app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+            app.UseHttpsRedirection();
+            app.UseTokenProvider(_tokenProviderOptions);
+            app.UseAuthentication();
+            
             app.UseMvc();
            // CreateUserRoles(services).Wait();
         }
