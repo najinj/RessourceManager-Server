@@ -50,10 +50,27 @@ namespace RessourceManagerApi.Controllers
             return reservations;
         }
 
-        public async Task<ActionResult<dynamic>> Availability(DateTime start,DateTime end,RType resourceType)
+        public async Task<ActionResult<dynamic>> Availability(ReservationViewModel reservationIn)
         {
-            var freeResources = await _reservationService.Availability(start, end, resourceType);
-            return freeResources;
+            if (string.IsNullOrWhiteSpace(reservationIn.CronoExpression))
+            {          
+                var freeResources = await _reservationService.Availability(reservationIn.Start,reservationIn.End,reservationIn.ResourceType,null);
+                return freeResources;
+            }
+            else
+            {
+                var expression = CronExpression.Parse(reservationIn.CronoExpression);
+                var occurrences = expression.GetOccurrences(
+                    reservationIn.Start,
+                    reservationIn.End,
+                    fromInclusive: true,
+                    toInclusive: true);
+                if (occurrences == null)
+                    return null;
+
+                var freeResources = await _reservationService.Availability(reservationIn.Start, reservationIn.End, reservationIn.ResourceType, occurrences);
+                return freeResources;
+            }
         } 
 
         // POST: api/Reservation
