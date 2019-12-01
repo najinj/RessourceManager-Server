@@ -80,7 +80,11 @@ namespace RessourceManager.Core.Services
             var reservations = await _reservationRepository.GetAll();
             return reservations.ToList();
         }
-
+        public async Task<List<Reservation>> GetUserReservations(string userId)
+        {
+            var reservations = await _reservationRepository.GetUserReservations(userId);
+            return reservations.ToList();
+        }
         public async Task<Reservation> Get(string reservationId)
         {
             var reservation = await _reservationRepository.GetById(reservationId);
