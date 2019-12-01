@@ -29,18 +29,26 @@ namespace RessourceManagerApi.Controllers
         public async Task<ActionResult<List<Reservation>>> Get() => 
             await _reservationService.Get();
 
+        [HttpGet]
+        public async Task<ActionResult<List<Reservation>>> GetReservationsByDate(DateTime start) =>
+            await _reservationService.Get(start);
+
+        [HttpGet]
+        public async Task<ActionResult<List<Reservation>>> GetReservationsByResource(string resourceId,DateTime? start) =>
+            await _reservationService.GetReservationsByResource(resourceId,start);
+
         // GET: api/Reservation/5
         [HttpGet("{id}", Name = "GetReservation")]
         public async Task<ActionResult<Reservation>> Get(string Id) => 
             await _reservationService.Get(Id);
 
         // GET: api/Reservation/5
-        [HttpGet("{id}", Name = "GetPeriodicReservations")]
-        public async Task<ActionResult<List<Reservation>>> GetPeriodicReservations(string periodicId) =>
-            await _reservationService.GetPeriodicReservations(periodicId);
+        [HttpGet(Name = "GetPeriodicReservations")]
+        public async Task<ActionResult<List<Reservation>>> GetPeriodicReservations(Guid periodicId) =>
+            await _reservationService.GetPeriodicReservations(periodicId.ToString());
 
         // GET: api/RessourceType/5
-        [HttpGet("{id:length(24)}", Name = "GetUserReservations")]
+        [HttpGet(Name = "GetUserReservations")]
         public async Task<ActionResult<List<Reservation>>> GetUserReservations()
         {
             var userId = User.Claims.Where(claim => claim.Type == JwtRegisteredClaimNames.Sid).FirstOrDefault().Value;
