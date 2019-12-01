@@ -39,6 +39,17 @@ namespace RessourceManagerApi.Controllers
         public async Task<ActionResult<List<Reservation>>> GetPeriodicReservations(string periodicId) =>
             await _reservationService.GetPeriodicReservations(periodicId);
 
+        // GET: api/RessourceType/5
+        [HttpGet("{id:length(24)}", Name = "GetUserReservations")]
+        public async Task<ActionResult<List<Reservation>>> GetUserReservations()
+        {
+            var userId = User.Claims.Where(claim => claim.Type == JwtRegisteredClaimNames.Sid).FirstOrDefault().Value;
+
+            var reservations = await _reservationService.GetUserReservations(userId);
+
+            return reservations;
+        }
+
         public async Task<ActionResult<dynamic>> Availability(DateTime start,DateTime end,RType resourceType)
         {
             var freeResources = await _reservationService.Availability(start, end, resourceType);
