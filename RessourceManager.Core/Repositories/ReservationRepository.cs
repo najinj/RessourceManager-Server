@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Infrastructure.Context;
+using System.Linq;
 
 namespace RessourceManager.Core.Repositories
 {
@@ -43,10 +44,14 @@ namespace RessourceManager.Core.Repositories
             return reservations.ToList();
         }
 
-        public async Task<List<Reservation>> GetReservationsByResource(string resourceId)
+        public async Task<List<Reservation>> GetReservationsByResource(string resourceId,DateTime? startDate)
         {
-            var reservations = await DbSet.FindAsync(reservation => reservation.ResourceId == resourceId);
-            return reservations.ToList();
+            var reservations = Enumerable.Empty<Reservation>();
+            if(!startDate.HasValue)
+                reservations = await DbSet.FindSync(reservation => reservation.ResourceId == resourceId).ToListAsync();
+            else
+                reservations = await DbSet.FindSync(reservation => reservation.ResourceId == resourceId && (reservation.Start >= startDate || reservation.End >= startDate )).ToListAsync();
+            return reservations.GroupBy(reservation => reservation.Id).Select(grp => grp.FirstOrDefault()).ToList();
         }
 
         public async Task RemovePeriodicReservations(string periodicId)

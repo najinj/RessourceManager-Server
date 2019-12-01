@@ -8,7 +8,7 @@ namespace RessourceManager.Core.Repositories.Interfaces
     public interface IReservationRepository : IRepository<Reservation>
     {
         Task<List<Reservation>> Get(DateTime start);
-        Task<List<Reservation>> GetReservationsByResource(string resourceId);
+        Task<List<Reservation>> GetReservationsByResource(string resourceId , DateTime? startDate);
         Task<List<Reservation>> GetReservationsByInterval(DateTime start, DateTime end);
         Task Add(IEnumerable<Reservation> reservationsIn);
         Task RemovePeriodicReservations(string periodicId);
