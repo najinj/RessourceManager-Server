@@ -51,9 +51,20 @@ namespace RessourceManager.Core.Services
             return reservationsIn;
         }
 
-        public async Task<dynamic> Availability(DateTime start, DateTime end, RType resourceType)
+        public async Task<dynamic> Availability(DateTime start, DateTime end, RType resourceType,IEnumerable<DateTime> occurrences)
         {
-            var reservations = await _reservationRepository.GetReservationsByInterval(start, end);
+            var reservations = new List<Reservation>();
+            if(occurrences == null)
+                reservations = await _reservationRepository.GetReservationsByInterval(start, end);
+            else
+            {
+                foreach (var startTime in occurrences)
+                {
+                    var endTime = new DateTime(startTime.Year, startTime.Month, startTime.Day, end.Hour, end.Minute, 0);
+                    var tempResources = await _reservationRepository.GetReservationsByInterval(startTime, endTime);
+                    reservations.AddRange(tempResources);
+                }
+            }
             var resourceIds = reservations.Where(reservation => reservation.ResourceType == resourceType).Select(reservation=> reservation.ResourceId).ToList();
             if(resourceType == RType.Space)
             {
