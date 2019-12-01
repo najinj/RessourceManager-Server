@@ -47,8 +47,11 @@ namespace RessourceManager.Core.Repositories
         public async Task<List<Reservation>> GetReservationsByResource(string resourceId,DateTime? startDate)
         {
             var reservations = Enumerable.Empty<Reservation>();
-            if(!startDate.HasValue)
+            if (!startDate.HasValue)
+            {
                 reservations = await DbSet.FindSync(reservation => reservation.ResourceId == resourceId).ToListAsync();
+                return reservations.ToList();
+            }             
             else
                 reservations = await DbSet.FindSync(reservation => reservation.ResourceId == resourceId && (reservation.Start >= startDate || reservation.End >= startDate )).ToListAsync();
             return reservations.GroupBy(reservation => reservation.Id).Select(grp => grp.FirstOrDefault()).ToList();
