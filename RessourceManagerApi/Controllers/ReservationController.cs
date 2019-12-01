@@ -159,7 +159,7 @@ namespace RessourceManagerApi.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id:length(24)}")]
-        public async Task<IActionResult> Remove(string id)
+        public async Task<IActionResult> RemoveReservation(string id)
         {          
             try
             {
