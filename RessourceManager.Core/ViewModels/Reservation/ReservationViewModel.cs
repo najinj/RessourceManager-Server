@@ -18,6 +18,8 @@ namespace RessourceManager.Core.ViewModels.Reservation
         
         [Required]
         public RType ResourceType { get; set; }
+
+        public string[] ResourceSubTypes { get; set; } = new string[] {};
         public string Title { get; set; }
         
         [Required]
