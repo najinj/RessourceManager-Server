@@ -128,6 +128,10 @@ namespace RessourceManagerApi.Controllers
                                 Title = reservationIn.Title,
                                 PeriodicId = periodicId,
                                 ResourceType = reservationIn.ResourceType,
+                                StartRecur = new DateTime(reservationIn.Start.Year,reservationIn.Start.Month,reservationIn.Start.Day,0,0,0),
+                                StartTime  = new DateTime(reservationIn.Start.Year, reservationIn.Start.Month, reservationIn.Start.Day, reservationIn.Start.Hour, reservationIn.Start.Minute, 0),
+                                EndRecur = new DateTime(reservationIn.End.Year, reservationIn.End.Month, reservationIn.End.Day, 0, 0, 0),
+                                EndTime = new DateTime(reservationIn.End.Year, reservationIn.End.Month, reservationIn.End.Day, reservationIn.End.Hour, reservationIn.End.Minute, 0),
                             }
                             );
                         }
@@ -204,7 +208,7 @@ namespace RessourceManagerApi.Controllers
                 {
                     return NotFound();
                 }
-                var userId = User.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
+                var userId = User.Claims.Where(claim => claim.Type == JwtRegisteredClaimNames.Sid).FirstOrDefault().Value;
                 var isAdmin = User.Claims.Where(claim => claim.Type == ClaimTypes.Role).FirstOrDefault().Value.Contains("Admin");
                 await _reservationService.Remove(reservation.Id, userId, isAdmin);
             }
@@ -220,12 +224,12 @@ namespace RessourceManagerApi.Controllers
             }
             return Ok();
         }
-        [HttpDelete("{id:length(24)}")]
+        [HttpDelete("{periodicId}")]
         public async Task<IActionResult> RemovePeriodicReservations(string periodicId)
         {
             try
             {
-                var userId = User.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value;
+                var userId = User.Claims.Where(claim => claim.Type == JwtRegisteredClaimNames.Sid).FirstOrDefault().Value;
                 var isAdmin = User.Claims.Where(claim => claim.Type == ClaimTypes.Role).FirstOrDefault().Value.Contains("Admin");
                 await _reservationService.RemovePeriodicReservations(periodicId,userId,isAdmin);
             }
