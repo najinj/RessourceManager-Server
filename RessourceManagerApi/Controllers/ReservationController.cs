@@ -62,7 +62,7 @@ namespace RessourceManagerApi.Controllers
         {
             if (string.IsNullOrWhiteSpace(reservationIn.CronoExpression))
             {          
-                var freeResources = await _reservationService.Availability(reservationIn.Start,reservationIn.End,reservationIn.ResourceType,null);
+                var freeResources = await _reservationService.Availability(reservationIn.Start,reservationIn.End,reservationIn.ResourceType, reservationIn.ResourceSubTypes, null);
                 return freeResources;
             }
             else
@@ -76,7 +76,7 @@ namespace RessourceManagerApi.Controllers
                 if (occurrences == null)
                     return null;
 
-                var freeResources = await _reservationService.Availability(reservationIn.Start, reservationIn.End, reservationIn.ResourceType, occurrences);
+                var freeResources = await _reservationService.Availability(reservationIn.Start, reservationIn.End, reservationIn.ResourceType, reservationIn.ResourceSubTypes, occurrences);
                 return freeResources;
             }
         } 
