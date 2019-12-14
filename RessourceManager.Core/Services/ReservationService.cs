@@ -51,7 +51,7 @@ namespace RessourceManager.Core.Services
             return reservationsIn;
         }
 
-        public async Task<dynamic> Availability(DateTime start, DateTime end, RType resourceType,IEnumerable<DateTime> occurrences)
+        public async Task<dynamic> Availability(DateTime start, DateTime end, RType resourceType,string[] resourceSubTypes,IEnumerable<DateTime> occurrences)
         {
             var reservations = new List<Reservation>();
             if(occurrences == null)
@@ -69,13 +69,13 @@ namespace RessourceManager.Core.Services
             if(resourceType == RType.Space)
             {
                 var spaces = await _spaceRepository.GetAll();
-                var freeSpaces = spaces.Where(space => !resourceIds.Contains(space.Id)).ToList();
+                var freeSpaces = spaces.Where(space => !resourceIds.Contains(space.Id) && resourceSubTypes.Any() ? resourceSubTypes.Contains(space.SpaceTypeId) : true).ToList();
                 return freeSpaces;
             }
             else
             {
                 var assets = await _assetRepository.GetAll();
-                var freeAssets = assets.Where(asset => !resourceIds.Contains(asset.Id)).ToList();
+                var freeAssets = assets.Where(asset => !resourceIds.Contains(asset.Id) && resourceSubTypes.Any() ? resourceSubTypes.Contains(asset.AssetTypeId) : true).ToList();
                 return freeAssets;
             }
         }
