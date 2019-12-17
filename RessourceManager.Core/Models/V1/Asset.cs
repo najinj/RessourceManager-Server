@@ -17,6 +17,9 @@ namespace RessourceManager.Core.Models.V1
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string AssetTypeId { get; set; }
+
+        public string AssetTypeName { get; set; }
+
         [BsonRepresentation(BsonType.ObjectId)]
         public string SpaceId { get; set; }  // An asset could be linked to a space
         public Status Status { get; set; } = Status.Unchained; // Default Value 
