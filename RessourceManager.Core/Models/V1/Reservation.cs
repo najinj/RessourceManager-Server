@@ -24,6 +24,8 @@ namespace RessourceManager.Core.Models.V1
         public string PeriodicId { get; set; }
         [Required]
         public RType ResourceType { get; set; }
+        public string ResourceTypeName { get; set; }
+
         public string Title { get; set; }
 
         [Required]

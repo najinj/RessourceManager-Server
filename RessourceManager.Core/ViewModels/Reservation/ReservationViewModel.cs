@@ -4,7 +4,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using RessourceManager.Core.Models.V1;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace RessourceManager.Core.ViewModels.Reservation
@@ -29,6 +28,8 @@ namespace RessourceManager.Core.ViewModels.Reservation
         public DateTime End { get; set; }
 
         public string CronoExpression { get; set; }
+
+        public string ResourceTypeName { get; set; }
 
     }
 }
