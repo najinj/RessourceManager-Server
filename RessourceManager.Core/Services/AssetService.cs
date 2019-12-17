@@ -69,6 +69,7 @@ namespace RessourceManager.Core.Services
 
                 ressourceTypeIn.Count++; // Increamenting count when adding an asset
                 await _ressourceTypeRepository.Update(ressourceTypeIn);
+                assetIn.AssetTypeName = ressourceTypeIn.Name;
                 await _assetRepository.Add(assetIn);
             }
             catch (MongoWriteException mwx)
@@ -102,6 +103,7 @@ namespace RessourceManager.Core.Services
             }
             try
             {
+                assetIn.AssetTypeName = ressourceTypeIn.Name;
                 await _assetRepository.Update(assetIn);
             }
             catch (MongoWriteException mwx)
