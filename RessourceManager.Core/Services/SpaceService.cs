@@ -55,6 +55,7 @@ namespace RessourceManager.Core.Services
             {
                 ressourceTypeIn.Count++; // Increamenting count when adding an asset
                 await _ressourceTypeRepository.Update(ressourceTypeIn);
+                spaceIn.SpaceTypeName = ressourceTypeIn.Name;
                 await _spaceRepository.Add(spaceIn);
 
             }
