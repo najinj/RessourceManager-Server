@@ -29,7 +29,11 @@ namespace RessourceManager.Core.ViewModels.Reservation
 
         public string CronoExpression { get; set; }
 
-        public string ResourceTypeName { get; set; }
+        public string ResourceTypeName {
+            get {
+                return ResourceType.ToString();
+            }
+        }
 
     }
 }
