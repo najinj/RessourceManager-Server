@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using RessourceManager.Core.Models.V1;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace RessourceManager.Core.ViewModels.Reservation
@@ -14,13 +15,13 @@ namespace RessourceManager.Core.ViewModels.Reservation
         [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid ResourceId")]
         [Required]
         public string ResourceId { get; set; }
-        
+
         [Required]
         public RType ResourceType { get; set; }
 
         public string[] ResourceSubTypes { get; set; } = new string[] {};
         public string Title { get; set; }
-        
+
         [Required]
         public DateTime Start { get; set; }
 
@@ -34,6 +35,9 @@ namespace RessourceManager.Core.ViewModels.Reservation
                 return ResourceType.ToString();
             }
         }
+        public IEnumerable<int> WeekDays { get;set;}
+
+        public string ResourceName { get; set; }
 
     }
 }
