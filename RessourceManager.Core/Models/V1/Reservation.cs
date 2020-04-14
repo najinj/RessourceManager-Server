@@ -24,6 +24,8 @@ namespace RessourceManager.Core.Models.V1
         public string PeriodicId { get; set; }
         [Required]
         public RType ResourceType { get; set; }
+        public string ResourceName { get; set; }
+
         public string ResourceTypeName { get; set; }
 
         public string Title { get; set; }
@@ -33,7 +35,12 @@ namespace RessourceManager.Core.Models.V1
 
         [Required]
         public DateTime End { get; set; }
-        public ICollection<int> DaysOfWeek { get; set; } = new List<int>();
+        public ICollection<int> DaysOfWeek { get; set; } = new List<int>();  // Built In parameter in the FullCallendar API
+        /*
+         A simalar field to allow to store the values for the days 
+         of the week until functionality for DaysOfWeek is implemented 
+         */
+        public IEnumerable<int> WeekDays { get; set; } = new List<int>();
         public DateTime StartTime { get; set; } // When DaysOfWeek is set , StartTime is used to get the start time(HH:mm:ss) of the recuring event 
         public DateTime EndTime { get; set; }
         public DateTime StartRecur { get; set; }// When DaysOfWeek is set , StartRecur is used to get the start Date of the recuring event 
