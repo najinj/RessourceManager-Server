@@ -69,13 +69,17 @@ namespace RessourceManager.Core.Services
             if(resourceType == RType.Space)
             {
                 var spaces = await _spaceRepository.GetAll();
-                var freeSpaces = spaces.Where(space => !resourceIds.Contains(space.Id) && resourceSubTypes.Any() ? resourceSubTypes.Contains(space.SpaceTypeId) : true).ToList();
+                var freeSpaces = spaces.Where(space => !resourceIds.Contains(space.Id)).ToList();
+                if (resourceSubTypes.Any() && freeSpaces.Any())
+                    freeSpaces = freeSpaces.Where(space => resourceSubTypes.Contains(space.SpaceTypeId)).ToList();
                 return freeSpaces;
             }
             else
             {
                 var assets = await _assetRepository.GetAll();
-                var freeAssets = assets.Where(asset => !resourceIds.Contains(asset.Id) && resourceSubTypes.Any() ? resourceSubTypes.Contains(asset.AssetTypeId) : true).ToList();
+                var freeAssets = assets.Where(asset => !resourceIds.Contains(asset.Id)).ToList();
+                if (resourceSubTypes.Any() && freeAssets.Any())
+                    freeAssets = freeAssets.Where(asset => resourceSubTypes.Contains(asset.AssetTypeId)).ToList();
                 return freeAssets;
             }
         }
