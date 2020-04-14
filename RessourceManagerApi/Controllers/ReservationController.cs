@@ -100,6 +100,8 @@ namespace RessourceManagerApi.Controllers
                             Title = reservationIn.Title,
                             PeriodicId = string.Empty,
                             ResourceType = reservationIn.ResourceType,
+                            ResourceTypeName = reservationIn.ResourceTypeName,
+                            ResourceName = reservationIn.ResourceName
                         };
                         await _reservationService.Add(reservation);
                         return CreatedAtRoute("GetReservation", new { id = reservation.ToString() }, reservation);
@@ -132,6 +134,9 @@ namespace RessourceManagerApi.Controllers
                                 StartTime  = new DateTime(reservationIn.Start.Year, reservationIn.Start.Month, reservationIn.Start.Day, reservationIn.Start.Hour, reservationIn.Start.Minute, 0),
                                 EndRecur = new DateTime(reservationIn.End.Year, reservationIn.End.Month, reservationIn.End.Day, 0, 0, 0),
                                 EndTime = new DateTime(reservationIn.End.Year, reservationIn.End.Month, reservationIn.End.Day, reservationIn.End.Hour, reservationIn.End.Minute, 0),
+                                WeekDays = reservationIn.WeekDays,
+                                ResourceTypeName = reservationIn.ResourceTypeName,
+                                ResourceName = reservationIn.ResourceName
                             }
                             );
                         }
