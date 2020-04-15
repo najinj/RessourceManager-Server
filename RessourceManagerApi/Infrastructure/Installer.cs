@@ -29,8 +29,8 @@ namespace RessourceManagerApi.Infrastructure
             services.AddTransient<IReservationRepository, ReservationRepository>();
             services.AddTransient<IReservationService, ReservationService>();
 
-            services.AddTransient<IEmailSettingRepository, EmailSettingRepository>();
-            services.AddTransient<IEmailSettingService, EmailSettingService>();
+            services.AddTransient<IBackOfficeSettingsRepository, BackOfficeSettingsRepository>();
+            services.AddTransient<IBackOfficeSettingsService, BackOfficeSettingsService>();
 
             services.AddTransient<IEmailSenderService, EmailSenderService>();
 
