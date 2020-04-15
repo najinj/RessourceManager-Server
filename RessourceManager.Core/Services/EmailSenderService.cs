@@ -10,18 +10,20 @@ namespace RessourceManager.Core.Services
 {
     public class EmailSenderService : IEmailSenderService
     {
-        private readonly IEmailSettingService _emailSettingService;
+        private readonly IBackOfficeSettingsService _backOfficeSettingsService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        public EmailSenderService(IEmailSettingService emailSettingService,IHostingEnvironment hostingEnvironment)
+        public EmailSenderService(IBackOfficeSettingsService backOfficeSettingsService, IHostingEnvironment hostingEnvironment)
         {
-            _emailSettingService = emailSettingService;
+            _backOfficeSettingsService = backOfficeSettingsService;
             _hostingEnvironment = hostingEnvironment;
         }
         public async Task SendEmailAsync(string email, string subject)
         {
             try
             {
-                var emailSettings = await _emailSettingService.Get();
+                var backOfficeSettings = await _backOfficeSettingsService.Get();
+
+                var emailSettings = backOfficeSettings.EmailSettings;
 
                 var mimeMessage = new MimeMessage();
 
