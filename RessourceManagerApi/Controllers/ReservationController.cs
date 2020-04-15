@@ -26,16 +26,27 @@ namespace RessourceManagerApi.Controllers
         }
         // GET: api/Reservation
         [HttpGet]
-        public async Task<ActionResult<List<Reservation>>> Get() => 
-            await _reservationService.Get();
+        public async Task<ActionResult<List<Reservation>>> Get() {
+            var reservations = await _reservationService.Get();
+            return reservations.OrderByDescending(reservation => reservation.Start).ToList();
+        }
+            
 
         [HttpGet]
-        public async Task<ActionResult<List<Reservation>>> GetReservationsByDate(DateTime start) =>
-            await _reservationService.Get(start);
+        public async Task<ActionResult<List<Reservation>>> GetReservationsByDate(DateTime start)
+        {
+            var reservations = await _reservationService.Get(start);
+            return reservations.OrderByDescending(reservation => reservation.Start).ToList();
+        }
+           
 
         [HttpGet]
-        public async Task<ActionResult<List<Reservation>>> GetReservationsByResource(string resourceId,DateTime? start) =>
-            await _reservationService.GetReservationsByResource(resourceId,start);
+        public async Task<ActionResult<List<Reservation>>> GetReservationsByResource(string resourceId,DateTime? start)
+        {
+            var reservations = await _reservationService.GetReservationsByResource(resourceId, start);
+            return reservations.OrderByDescending(reservation => reservation.Start).ToList();
+        }
+            
 
         // GET: api/Reservation/5
         [HttpGet("{id}", Name = "GetReservation")]
@@ -55,7 +66,7 @@ namespace RessourceManagerApi.Controllers
 
             var reservations = await _reservationService.GetUserReservations(userId);
 
-            return reservations;
+            return reservations.OrderByDescending(reservation => reservation.Start).ToList(); ;
         }
 
         public async Task<ActionResult<dynamic>> Availability(ReservationViewModel reservationIn)
