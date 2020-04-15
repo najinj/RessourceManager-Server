@@ -39,12 +39,12 @@ namespace RessourceManager.Core.Services
         public async void Remove()
         {
             var emailSettings = await Get();
-            _emailSettingRepository.Remove(emailSettings.Id);
+            await _emailSettingRepository.Remove(emailSettings.Id);
         }
 
-        public void Update(EmailSettings emailSettingsIn)
+        public async void Update(EmailSettings emailSettingsIn)
         {
-            _emailSettingRepository.Update(emailSettingsIn);
+            await _emailSettingRepository.Update(emailSettingsIn);
         }
     }
 }
