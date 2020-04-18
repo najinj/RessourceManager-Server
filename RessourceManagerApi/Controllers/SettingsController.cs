@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Services.Interfaces;
+using RessourceManager.Core.ViewModels.Settings;
 using System.Threading.Tasks;
+using System;
 
 namespace RessourceManagerApi.Controllers
 {
@@ -17,7 +19,11 @@ namespace RessourceManagerApi.Controllers
         }
         // GET: api/Settings
         [HttpGet]
-        public async Task<BackOfficeSettings> GetSettings() => await _backOfficeSettingsService.Get();
+        public async Task<BackOfficeSettingsViewModel> GetSettings() {
+            var settings = await _backOfficeSettingsService.Get();
+            return new BackOfficeSettingsViewModel(settings);
+        }
+
 
         // POST: api/Settings
         [HttpPost]
@@ -27,10 +33,15 @@ namespace RessourceManagerApi.Controllers
         }
 
         // PUT: api/Settings/5
-        [HttpPut("{id}")]
-        public async Task UpdateSettings(string id, BackOfficeSettings settingsIn)
+        [HttpPut]
+        public async Task<BackOfficeSettingsViewModel> UpdateSettings(BackOfficeSettings settingsIn)
         {
-            await _backOfficeSettingsService.Update(settingsIn);
+            if (ModelState.IsValid)
+            {
+                var settings =  await _backOfficeSettingsService.Update(settingsIn);
+                return new BackOfficeSettingsViewModel(settings);
+            }
+            return null;
         }
     }
 }
