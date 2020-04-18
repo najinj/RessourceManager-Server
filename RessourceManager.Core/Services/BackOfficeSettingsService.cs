@@ -43,9 +43,10 @@ namespace RessourceManager.Core.Services.Interfaces
             await _backOfficeSettingsRepository.Remove(settings.Id);
         }
 
-        public async Task Update(BackOfficeSettings settings)
+        public async Task<BackOfficeSettings> Update(BackOfficeSettings settings)
         {
-            await _backOfficeSettingsRepository.Update(settings);
+             await _backOfficeSettingsRepository.Update(settings);
+            return settings;
         }
     }
 }

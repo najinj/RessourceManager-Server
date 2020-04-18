@@ -7,7 +7,7 @@ namespace RessourceManager.Core.Services.Interfaces
     {
         Task<BackOfficeSettings> Get();
         Task<BackOfficeSettings> Create(BackOfficeSettings settingsIn);
-        Task Update(BackOfficeSettings settingsIn);
+        Task<BackOfficeSettings> Update(BackOfficeSettings settingsIn);
         Task Remove();
     }
 }
