@@ -10,6 +10,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RessourceManager.Core.ViewModels.Reservation
 {
+    public class AvailabilityViewModel
+    {
+        [Required]
+        public RType ResourceType { get; set; }
+
+        public string[] ResourceSubTypes { get; set; } = new string[] { };
+
+        [Required]
+        [DateIntervalValidation]
+        [DateNotInThePastValidation(ErrorMessage = "Can't book a reservation in the past")]
+        public DateTime Start { get; set; }
+
+        [Required]
+        [DateIntervalValidation]
+        [DateNotInThePastValidation(ErrorMessage = "Can't book a reservation in the past")]
+        public DateTime End { get; set; }
+
+        public string CronoExpression { get; set; }
+
+    }
+
     public class ReservationViewModel
     {
         [BsonRepresentation(BsonType.ObjectId)]
@@ -25,7 +46,7 @@ namespace RessourceManager.Core.ViewModels.Reservation
 
         [Required]
         [DateIntervalValidation]
-        [DateNotInThePastValidation]
+        [DateNotInThePastValidation(ErrorMessage = "Can't book a reservation in the past")]
         public DateTime Start { get; set; }
 
         [Required]
