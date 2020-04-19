@@ -69,8 +69,11 @@ namespace RessourceManagerApi.Controllers
             return reservations.OrderByDescending(reservation => reservation.Start).ToList(); ;
         }
 
-        public async Task<ActionResult<dynamic>> Availability(ReservationViewModel reservationIn)
+        public async Task<ActionResult<dynamic>> Availability(AvailabilityViewModel reservationIn)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(new ValidationProblemDetails(ModelState));
+
             if (string.IsNullOrWhiteSpace(reservationIn.CronoExpression))
             {          
                 var freeResources = await _reservationService.Availability(reservationIn.Start,reservationIn.End,reservationIn.ResourceType, reservationIn.ResourceSubTypes, null);
@@ -100,7 +103,7 @@ namespace RessourceManagerApi.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {             
+                {
                     if (string.IsNullOrWhiteSpace(reservationIn.CronoExpression)){
                         var reservation = new Reservation
                         {
