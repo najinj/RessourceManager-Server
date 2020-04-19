@@ -117,12 +117,12 @@ namespace RessourceManager.Core.ViewModels.Settings
                 {
                     new IntegerType
                     {
-                            Label = "Max number per user",
+                            Label = "Max number of reservations per user",
                             Name = "MaxNumberOfReservationsPerUser",
                     },
                     new IntegerType
                     {
-                            Label = "Max duration",
+                            Label = "Max duration of reservation in hours",
                             Name = "MaxDurationPerReservation",
                     },
                     new IntegerType
