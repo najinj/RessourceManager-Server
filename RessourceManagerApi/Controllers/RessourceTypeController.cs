@@ -7,11 +7,13 @@ using RessourceManager.Core.ViewModels.RessourceType;
 using RessourceManager.Core.Services.Interfaces;
 using RessourceManager.Core.Helpers;
 using RessourceManager.Core.Exceptions.RessourceType;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class RessourceTypeController : ControllerBase
     {
         private readonly IRessourceTypeService _ressourceTypeService;
@@ -61,8 +63,7 @@ namespace RessourceManagerApi.Controllers
         }
 
         // POST: api/RessourceType
-        //  [Authorize(Roles = "Admin")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<RessourceType>> Create(RessourceTypeViewModel ressourceTypeIn)
         {
@@ -92,6 +93,7 @@ namespace RessourceManagerApi.Controllers
 
         // PUT: api/RessourceType/5
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(string id, RessourceTypeViewModel ressourceTypeIn)
         {
             if (!ModelState.IsValid)
@@ -120,6 +122,7 @@ namespace RessourceManagerApi.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             var ressourceType = await _ressourceTypeService.Get(id);

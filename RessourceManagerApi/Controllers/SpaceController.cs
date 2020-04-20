@@ -9,11 +9,13 @@ using RessourceManager.Core.Exceptions.Space;
 using RessourceManager.Core.Exceptions.Asset;
 using RessourceManager.Core.ViewModels.Space;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class SpaceController : ControllerBase
     {
         private readonly ISpaceService _spaceService;
@@ -47,6 +49,7 @@ namespace RessourceManagerApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Space>> Create(SpaceViewModel spaceIn)
         {
             if (ModelState.IsValid)
@@ -88,6 +91,7 @@ namespace RessourceManagerApi.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(string id, SpaceViewModel spaceIn)
         {
             if (ModelState.IsValid)
@@ -133,6 +137,7 @@ namespace RessourceManagerApi.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             var space = await _spaceService.Get(id);
@@ -153,6 +158,7 @@ namespace RessourceManagerApi.Controllers
         }
 
         [HttpGet("{assetId}/{spaceId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveAssetFromSpace(string assetId,string spaceId)
         {
             Space space;
@@ -174,6 +180,7 @@ namespace RessourceManagerApi.Controllers
         }
 
         [HttpGet("{assetId}/{spaceId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddAssetToSpace(string assetId, string spaceId)
         {
             Space space;

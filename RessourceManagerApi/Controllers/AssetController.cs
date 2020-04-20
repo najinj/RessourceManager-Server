@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Exceptions.Asset;
 using RessourceManager.Core.Exceptions.RessourceType;
@@ -13,6 +14,7 @@ namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class AssetController : ControllerBase
     {
         private readonly IAssetService _assetService;
@@ -46,6 +48,7 @@ namespace RessourceManagerApi.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Asset>> Create(Asset asset)
         {
             if (ModelState.IsValid)
@@ -80,6 +83,7 @@ namespace RessourceManagerApi.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(string id, Asset assetIn)
         {
             if (ModelState.IsValid)
@@ -113,6 +117,7 @@ namespace RessourceManagerApi.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             var space = await _assetService.Get(id);
