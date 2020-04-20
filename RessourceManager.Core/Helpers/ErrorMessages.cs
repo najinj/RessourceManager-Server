@@ -47,6 +47,9 @@ namespace RessourceManager.Core.Helpers
                 case ErrorMessagesEnum.NotAvailable:
                     return "The selected Resource is not available durring this period";
 
+                case ErrorMessagesEnum.MaximumDurationExceeded:
+                    return "You have Exceeded the maximum durration for a single reservation";
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(message), message, null);
             }
