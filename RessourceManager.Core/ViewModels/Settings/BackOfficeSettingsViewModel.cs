@@ -132,7 +132,7 @@ namespace RessourceManager.Core.ViewModels.Settings
                     },
                     new IntegerType
                     {
-                            Label = "interval of reservations",
+                            Label = "interval of reservations in days",
                             Name = "IntervalAllowedForReservations",
                     },
                 }
