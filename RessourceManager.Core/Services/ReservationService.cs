@@ -16,20 +16,30 @@ namespace RessourceManager.Core.Services
         private readonly IAssetRepository _assetRepository;
         private readonly ISpaceRepository _spaceRepository;
         private readonly IErrorHandler _errorHandler;
+        private readonly IBackOfficeSettingsService _backOfficeSettingsService;
         public ReservationService(IReservationRepository reservationRepository, 
                                   IAssetRepository assetRepository,
                                   IErrorHandler errorHandler,
-                                  ISpaceRepository spaceRepository)
+                                  ISpaceRepository spaceRepository,
+                                  IBackOfficeSettingsService backOfficeSettingsService)
         {
             _reservationRepository = reservationRepository;
             _errorHandler = errorHandler;
             _assetRepository = assetRepository;
             _spaceRepository = spaceRepository;
             _errorHandler = errorHandler;
+            _backOfficeSettingsService = backOfficeSettingsService;
         }
 
         public async Task<Reservation> Add(Reservation reservationIn)
         {
+            var validDuration = await ValidateReservationDuration(reservationIn);
+            if (!validDuration)
+            {
+                    throw new ReservationServiceException(_errorHandler.GetMessage(ErrorMessagesEnum.MaximumDurationExceeded)
+                            , new string[] { nameof(Reservation.End) });
+            }
+
             var availability = await _reservationRepository.CheckResourceAvailability(reservationIn.Start, reservationIn.End, reservationIn.ResourceId);
             if(!availability)
                 throw new ReservationServiceException(_errorHandler.GetMessage(ErrorMessagesEnum.NotAvailable)
@@ -42,6 +52,12 @@ namespace RessourceManager.Core.Services
         {
             foreach (var reservation in reservationsIn)
             {
+                var validDuration = await ValidateReservationDuration(reservation);
+                if (!validDuration)
+                {
+                    throw new ReservationServiceException(_errorHandler.GetMessage(ErrorMessagesEnum.MaximumDurationExceeded)
+                            , new string[] { nameof(Reservation.End) });
+                }
                 var availability = await _reservationRepository.CheckResourceAvailability(reservation.Start, reservation.End, reservation.ResourceId);
                 if(!availability)
                     throw new ReservationServiceException(_errorHandler.GetMessage(ErrorMessagesEnum.NotAvailable)
@@ -140,6 +156,26 @@ namespace RessourceManager.Core.Services
         public Task Update(Reservation reservationIn)
         {
             throw new System.NotImplementedException();
+        }
+
+        private async Task<bool> ValidateReservationDuration(Reservation reservation)
+        {
+            var settings = await _backOfficeSettingsService.Get();
+            var reservationSettings = settings.ReservationSettings;
+            if (!string.IsNullOrEmpty(reservation.PeriodicId))
+            {
+                var diff = (reservation.EndTime - reservation.StartTime).TotalMinutes / 60;
+                if (diff > reservationSettings.MaxDurationPerReservation)
+                    return false;
+                return true;
+            }
+            else
+            {
+                var diff = (reservation.End - reservation.Start).TotalMinutes / 60;
+                if (diff > reservationSettings.MaxDurationPerReservation)
+                    return false;
+                return true;
+            }
         }
     }
 }
