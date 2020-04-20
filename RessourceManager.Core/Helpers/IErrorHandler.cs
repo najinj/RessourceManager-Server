@@ -25,5 +25,6 @@ namespace RessourceManager.Core.Helpers
         DuplicateKey = 10,
         NotFound = 11,
         NotAvailable = 12,
+        MaximumDurationExceeded = 13,
     }
 }
