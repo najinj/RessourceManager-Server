@@ -15,4 +15,6 @@ namespace RessourceManager.Core.ViewModels.Authentication
         [DataType(DataType.Password)]
         public string Password { get; set; }
     }
+
+    public enum LoginResult { WrongCredentials, NotActivated , Success};
 }
