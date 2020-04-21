@@ -17,7 +17,23 @@ namespace RessourceManager.Core.Services
             _backOfficeSettingsService = backOfficeSettingsService;
             _hostingEnvironment = hostingEnvironment;
         }
-        public async Task SendEmailAsync(string email, string subject)
+
+        public Task SendActivationEmailAsync(string email)
+        {
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Templates/ActivationEmail.html");
+            var body = File.ReadAllText(path);
+            return SendEmailAsync(email, "Your Account has been Activated", body);
+        }
+
+        public Task SendResetPasswordEmailAsync(string email,string token)
+        {
+            var path = Path.Combine(_hostingEnvironment.ContentRootPath, "Templates/ResetPasswordEmail.html");
+            var body = File.ReadAllText(path);
+            body = body.Replace("#token#", token);
+            return SendEmailAsync(email, "Reset Password", body);
+        }
+
+        private async Task SendEmailAsync(string email, string subject,string body)
         {
             try
             {
@@ -33,14 +49,9 @@ namespace RessourceManager.Core.Services
 
                 mimeMessage.Subject = subject;
 
-                string Body = Path.Combine(_hostingEnvironment.ContentRootPath, "Templates/ActivationEmail.html");
-
-
-
-
                 mimeMessage.Body = new TextPart("html")
                 {
-                    Text = File.ReadAllText(Body),
+                    Text = body,
                 };
 
                 using (var client = new SmtpClient())
