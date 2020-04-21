@@ -6,6 +6,7 @@ namespace RessourceManager.Core.Services.Interfaces
 {
     public interface IEmailSenderService
     {
-       Task SendEmailAsync(string email, string subject);
+       Task SendActivationEmailAsync(string email);
+       Task SendResetPasswordEmailAsync(string email,string token);
     }
 }
