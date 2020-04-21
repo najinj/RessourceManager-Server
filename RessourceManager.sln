@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RessourceManagerApi", "Ress
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RessourceManager.Core", "RessourceManager.Core\RessourceManager.Core.csproj", "{AEE0C02C-0E12-4843-BC7B-FE880CD233BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RessourceManager.Infrastructure", "RessourceManager.Infrastructure\RessourceManager.Infrastructure.csproj", "{D7467913-CD41-4640-BD4E-0B0075AD7A82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RessourceManager.Infrastructure", "RessourceManager.Infrastructure\RessourceManager.Infrastructure.csproj", "{D7467913-CD41-4640-BD4E-0B0075AD7A82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
