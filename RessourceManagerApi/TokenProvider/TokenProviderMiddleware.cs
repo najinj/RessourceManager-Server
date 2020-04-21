@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using RessourceManager.Core.ViewModels.Authentication;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -51,8 +52,16 @@ namespace RessourceManagerApi.TokenProvider
             var result = await _options.IdentityResolver(username, password);
             if (result.identity == null)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await context.Response.WriteAsync(result.message);
+                if(result.loginResult == (int)LoginResult.NotActivated)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Locked;
+                    await context.Response.WriteAsync("Account Not activated");
+                }
+                else
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    await context.Response.WriteAsync("Bad Credentials");
+                }
                 return;
             }
 
