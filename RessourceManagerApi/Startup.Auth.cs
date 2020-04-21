@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.ViewModels.Authentication;
 using RessourceManagerApi.TokenProvider;
 using System;
 using System.Collections.Generic;
@@ -74,8 +75,8 @@ namespace RessourceManagerApi
                         _tokenValidationParameters);
                 });
 
-            
 
+            services.Configure<DataProtectionTokenProviderOptions>(option => option.TokenLifespan = TimeSpan.FromSeconds(120));
 
         }
 
@@ -84,7 +85,7 @@ namespace RessourceManagerApi
             _app = app;
         }
 
-        private async Task<(ClaimsIdentity identity, string message)> GetIdentity(string username, string password)
+        private async Task<(ClaimsIdentity identity, int loginResult)> GetIdentity(string username, string password)
         {
 
             using (var serviceScope = _app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -111,15 +112,15 @@ namespace RessourceManagerApi
                         claims.Add(new Claim(ClaimTypes.Role, userRole));
                     }
 
-                    return (new ClaimsIdentity(new GenericIdentity(username, "Token"), claims), string.Empty);
+                    return (new ClaimsIdentity(new GenericIdentity(username, "Token"), claims), (int)LoginResult.Success);
                     
                 }
                 else if (result && !user.Activated)
                 {
-                    return (null, "Account is not Activated");
+                    return (null, (int)LoginResult.NotActivated);
                 }
                 else
-                    return (null, "Bad Credentials");
+                    return (null, (int)LoginResult.WrongCredentials);
              
             }
         }
