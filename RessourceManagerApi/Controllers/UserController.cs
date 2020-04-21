@@ -51,7 +51,7 @@ namespace RessourceManagerApi.Controllers
                 {
                     try
                     {
-                        await _emailService.SendEmailAsync(email, "Your Account Has Been Activated");
+                        await _emailService.SendActivationEmailAsync(email);
                     }
 
                     catch (Exception ex)
