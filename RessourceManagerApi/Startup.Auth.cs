@@ -76,7 +76,7 @@ namespace RessourceManagerApi
                 });
 
 
-            services.Configure<DataProtectionTokenProviderOptions>(option => option.TokenLifespan = TimeSpan.FromSeconds(120));
+            services.Configure<DataProtectionTokenProviderOptions>(option => option.TokenLifespan = TimeSpan.FromMinutes(5));
 
         }
 
