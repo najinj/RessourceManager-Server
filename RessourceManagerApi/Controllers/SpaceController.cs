@@ -108,7 +108,9 @@ namespace RessourceManagerApi.Controllers
                     {
                         var assets = await _assetService.Get(spaceIn.assets);
                         space.assests = assets;
-                    }                       
+                    }
+                    else
+                        space.assests = new List<Asset>();
                     space.Capacity = spaceIn.Capacity;
                     space.Name = spaceIn.Name;
                     space.SpaceTypeId = spaceIn.SpaceTypeId;
