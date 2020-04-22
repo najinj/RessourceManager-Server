@@ -164,7 +164,7 @@ namespace RessourceManager.Core.Services
             var reservationSettings = settings.ReservationSettings;
             if (!string.IsNullOrEmpty(reservation.PeriodicId))
             {
-                var diff = (reservation.EndTime - reservation.StartTime).TotalMinutes / 60;
+                var diff = (reservation.EndTime.TimeOfDay - reservation.StartTime.TimeOfDay).TotalMinutes / 60;
                 if (diff > reservationSettings.MaxDurationPerReservation)
                     return false;
                 return true;
