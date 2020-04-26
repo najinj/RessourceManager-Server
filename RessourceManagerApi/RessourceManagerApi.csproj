@@ -6,20 +6,35 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\ApplicationUser.cs" />
+    <Compile Remove="Services\**" />
+    <Content Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.Identity.MongoDbCore" Version="1.1.1" />
+    <Compile Remove="Controllers\PostsController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Templates\ResetPasswordEmail.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\ResetPasswordEmail.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cronos" Version="0.7.0" />
     <PackageReference Include="MailKit" Version="2.3.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
-    <PackageReference Include="MongoDB.Driver" Version="2.9.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RessourceManager.Core\RessourceManager.Core.csproj" />
+    <ProjectReference Include="..\RessourceManager.Infrastructure\RessourceManager.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

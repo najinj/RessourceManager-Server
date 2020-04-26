@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using test_mongo_auth.Helpers;
+using RessourceManagerApi.Helpers;
 using Microsoft.AspNetCore.Cors;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.ViewModels.Authentication;
+using RessourceManager.Core.Services.Interfaces;
 
-namespace test_mongo_auth.Controllers
+namespace RessourceManagerApi.Controllers
 {
     [EnableCors("MyPolicy")]
     [Route("api/[controller]/[action]")]
@@ -22,17 +23,20 @@ namespace test_mongo_auth.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly IEmailSenderService _emailService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration,
-            RoleManager<ApplicationRole> roleManager)
+            RoleManager<ApplicationRole> roleManager,
+            IEmailSenderService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _roleManager = roleManager;
+            _emailService = emailService;
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -110,8 +114,38 @@ namespace test_mongo_auth.Controllers
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
+        [HttpGet]
+        public async Task<ActionResult> ResetPassword(string email)
+        {
+            var user = await _userManager.FindByNameAsync(email);
+            if(user != null)
+            {
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                await _emailService.SendResetPasswordEmailAsync(email, resetToken);
+                return Ok(resetToken);
+            }
+            return null;
+        }
 
-        
+        [HttpPost]
+        public async Task<ActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            var user = await _userManager.FindByNameAsync(model.Email);
+            if (user != null)
+            {
+                var result = await _userManager.ResetPasswordAsync(user,model.ResetToken, model.Password);
+                if (result.Succeeded)
+                {
+                    return Ok();
+                }
+                return BadRequest(result.Errors);
+
+            }
+            return BadRequest("User not found");
+        }
+
+
+
 
     }
 }

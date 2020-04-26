@@ -1,30 +1,24 @@
 ﻿
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using System.Threading.Tasks;
-using AspNetCore.Identity.MongoDbCore.Extensions;
-using AspNetCore.Identity.MongoDbCore.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using RessourceManager.Core.Models.V1;
-using RessourceManagerApi.Services;
-using test_mongo_auth.Models;
-using test_mongo_auth.Services;
+using RessourceManager.Api.Infrastructure.Middlewares;
+using AspNetCore.Identity.MongoDbCore.Infrastructure;
+using AspNetCore.Identity.MongoDbCore.Extensions;
+using RessourceManager.Infrastructure.DatabaseSettings;
+using RessourceManagerApi.ExtensionMethods;
 
-namespace test_mongo_auth
+namespace RessourceManagerApi
 {
-    public class Startup
+    public partial class Startup
     {
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -49,80 +43,21 @@ namespace test_mongo_auth
                 options.SuppressUseValidationProblemDetailsForInvalidModelStateResponses = false;
             });
 
-            services.Configure<RessourceDatabaseSettings>(
-                      Configuration.GetSection(nameof(RessourceDatabaseSettings)));
-
-            services.AddSingleton<IRessourceDatabaseSettings>(sp =>
-                sp.GetRequiredService<IOptions<RessourceDatabaseSettings>>().Value);
-
-            var mongoDbIdentityConfiguration = new MongoDbIdentityConfiguration
-            {
-                MongoDbSettings = new MongoDbSettings
-                {
-                    ConnectionString = "mongodb://localhost:27017",
-                    DatabaseName = "RessourceManagmentDb"
-                },
-                IdentityOptionsAction = options =>
-                {
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequireLowercase = true;
-                    options.Password.RequireUppercase = true;
-                    options.Password.RequireNonAlphanumeric = true;
-                    options.Password.RequireDigit = true;
-
-                    // Lockout settings
-                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                    options.Lockout.MaxFailedAccessAttempts = 10;
-
-                    // ApplicationUser settings
-                    options.User.RequireUniqueEmail = true;
-                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_";
-                }
-            };
-            services.ConfigureMongoDbIdentity<ApplicationUser, ApplicationRole, Guid>(mongoDbIdentityConfiguration);
-
-
-
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
+            
+            RessourceManagerApi.Infrastructure.Installer.ConfigureServices(services);
+            RessourceManager.Infrastructure.Installer.RegisterServices(services, Configuration);
+            // RegisterServices(services);
+            ConfigureDbIdentity(services);
 
-            services.AddAuthentication(options =>
-            {
-                //Set default Authentication Schema as Bearer
-                options.DefaultAuthenticateScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme =
-                           JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(cfg =>
-            {
-                cfg.RequireHttpsMetadata = false;
-                cfg.SaveToken = true;
-                cfg.TokenValidationParameters =
-                       new TokenValidationParameters
-                       {
-                           ValidIssuer = Configuration["JwtIssuer"],
-                           ValidAudience = Configuration["JwtIssuer"],
-                           IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
-                           ClockSkew = TimeSpan.Zero // remove delay of token when expire
-                       };
-            });
+            services.AddMvc();
+            RegisterAuth(services);
 
-
-            services.AddSingleton<ReservationService>();
-            services.AddSingleton<EmailSenderService>();
-            services.AddSingleton<PostService>();
-            services.AddSingleton<SpaceService>();
-            services.AddSingleton<AssetService>();
-            services.AddSingleton<RessourceTypeService>();
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,IServiceProvider services)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -134,10 +69,13 @@ namespace test_mongo_auth
                 app.UseHsts();
             }
             app.UseCors("MyPolicy");
-            app.UseHttpsRedirection();
-            app.UseAuthentication();
+            app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+            ConfigureAuth(app);
+            app.UseHttpsRedirection();           
+            app.UseTokenProvider(_tokenProviderOptions);
+            app.UseAuthentication();          
             app.UseMvc();
-            CreateUserRoles(services).Wait();
+           // CreateUserRoles(services).Wait();
         }
 
 
@@ -160,6 +98,40 @@ namespace test_mongo_auth
             ApplicationUser user = await UserManager.FindByEmailAsync("naji.ensat@gmailcom");
             if(user != null)
                  await UserManager.AddToRoleAsync(user, "Admin");
+        }
+
+        private void ConfigureDbIdentity(IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var ressourceDatabaseSettingsService = serviceProvider.GetService<IRessourceDatabaseSettings>();
+                   
+            var mongoDbIdentityConfiguration = new MongoDbIdentityConfiguration
+            {
+                MongoDbSettings = new MongoDbSettings
+                {
+                    ConnectionString = ressourceDatabaseSettingsService.ConnectionString,
+                    DatabaseName = ressourceDatabaseSettingsService.DatabaseName
+                },
+                IdentityOptionsAction = options =>
+                {
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireLowercase = true;
+                    options.Password.RequireUppercase = true;
+                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequireDigit = true;
+
+                    // Lockout settings
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                    options.Lockout.MaxFailedAccessAttempts = 10;
+
+                    // ApplicationUser settings
+                    options.User.RequireUniqueEmail = true;
+                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_";
+                }
+            };
+
+            services.ConfigureMongoDbIdentity<ApplicationUser, ApplicationRole, Guid>(mongoDbIdentityConfiguration);
+
         }
     }
 }

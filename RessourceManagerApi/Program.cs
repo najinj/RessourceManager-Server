@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace test_mongo_auth
+namespace RessourceManagerApi
 {
     public class Program
     {

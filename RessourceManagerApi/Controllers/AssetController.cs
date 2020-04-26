@@ -1,32 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RessourceManager.Core.Exceptions.Asset;
+using RessourceManager.Core.Exceptions.RessourceType;
+using RessourceManager.Core.Exceptions.Space;
 using RessourceManager.Core.Models.V1;
-using RessourceManagerApi.Exceptions.Asset;
-using test_mongo_auth.Services;
+using RessourceManager.Core.Services.Interfaces;
 
-namespace test_mongo_auth.Controllers
+
+namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class AssetController : ControllerBase
     {
-        private readonly AssetService _assetService;
+        private readonly IAssetService _assetService;
 
-        public AssetController(AssetService assetService)
+        public AssetController(IAssetService assetService)
         {
             _assetService = assetService;
         }
 
 
         [HttpGet]
-        public ActionResult<List<Asset>> Get() =>
-            _assetService.Get();
+        public async Task<ActionResult<List<Asset>>> Get()
+        {
+            var list = await _assetService.Get();
+            return list;
+        }
+            
 
         [HttpGet("{id:length(24)}", Name = "GetAsset")]
-        public ActionResult<Asset> Get(string id)
+        public async Task<ActionResult<Asset>> Get(string id)
         {
-            var asset = _assetService.Get(id);
+            var asset = await _assetService.Get(id);
 
             if (asset == null)
             {
@@ -38,36 +48,47 @@ namespace test_mongo_auth.Controllers
 
 
         [HttpPost]
-        public ActionResult<Asset> Create(Asset asset)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Asset>> Create(Asset asset)
         {
             if (ModelState.IsValid)
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    _assetService.Create(asset);
+                    try
+                    {
+                        var result = await _assetService.Create(asset);
+                    }
+                    catch (RessourceTypeRepositoryException ex)
+                    {
+                        ModelState.AddModelError(ex.Field, ex.Message);
+                        return BadRequest(new ValidationProblemDetails(ModelState));
+                    }
+                    catch (SpaceRepositoryException ex)
+                    {
+                        ModelState.AddModelError(ex.Field, ex.Message);
+                        return BadRequest(new ValidationProblemDetails(ModelState));
+                    }
+                    catch (AssetRepositoryException ex)
+                    {
+                        ModelState.AddModelError(ex.Field, ex.Message);
+                        return BadRequest(new ValidationProblemDetails(ModelState));
+                    }
+                    return CreatedAtRoute("GetSpace", new { id = asset.Id.ToString() }, asset);
                 }
-                catch(AssetDuplicateKeyException ex)
-                {
-                    ModelState.AddModelError("Name", ex.Message);
-                    return BadRequest(new ValidationProblemDetails(ModelState));
-                }
-                catch(Exception ex)
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-
-                return CreatedAtRoute("GetAsset", new { id = asset.Id.ToString() }, asset);
+                return BadRequest(new ValidationProblemDetails(ModelState));
             }
             
             return BadRequest(new ValidationProblemDetails(ModelState));
         }
 
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, Asset assetIn)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(string id, Asset assetIn)
         {
             if (ModelState.IsValid)
             {
-                var space = _assetService.Get(id);
+                var space = await _assetService.Get(id);
 
                 if (space == null)
                 {
@@ -75,13 +96,20 @@ namespace test_mongo_auth.Controllers
                 }
                 try
                 {
-                    _assetService.Update(id, assetIn);
+                    assetIn.Id = id;
+                    await _assetService.Update(assetIn);
                 }
-                catch (Exception ex)
+                catch (RessourceTypeRepositoryException ex)
                 {
-                    return StatusCode(500, "Internal server error");
+                    ModelState.AddModelError(ex.Field, ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
                 }
-                return CreatedAtRoute("GetAsset", new { id = assetIn.Id.ToString() }, assetIn);
+                catch (AssetRepositoryException ex)
+                {
+                    ModelState.AddModelError(ex.Field, ex.Message);
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+                return CreatedAtRoute("GetSpace", new { id = assetIn.Id.ToString() }, assetIn);
             }
             return BadRequest(new ValidationProblemDetails(ModelState));
 
@@ -89,18 +117,24 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(string id)
         {
-            var asset = _assetService.Get(id);
+            var space = await _assetService.Get(id);
 
-            if (asset == null)
+            if (space == null)
             {
                 return NotFound();
             }
-
-            _assetService.Remove(asset.Id);
-
-            return NoContent();
+            try
+            {
+                await _assetService.Remove(space.Id);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            return Ok();
         }
 
     }

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using RessourceManager.Core.Models.V1;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace RessourceManager.Core.Repositories.Interfaces
 {
-    interface IAssetRepository
+    public interface IAssetRepository : IRepository<Asset>
     {
-
+        Task<IEnumerable<Asset>> Get(List<string> ids);
     }
 }

@@ -1,36 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.ViewModels.RessourceType;
-using RessourceManagerApi.Exceptions.RessourceType;
-using test_mongo_auth.Services;
+using RessourceManager.Core.Services.Interfaces;
+using RessourceManager.Core.Helpers;
+using RessourceManager.Core.Exceptions.RessourceType;
+using Microsoft.AspNetCore.Authorization;
 
-namespace test_mongo_auth.Controllers
+namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class RessourceTypeController : ControllerBase
     {
-        private readonly RessourceTypeService _ressourceTypeService;
+        private readonly IRessourceTypeService _ressourceTypeService;
+        private readonly IErrorHandler _errorHandler;
 
 
-        public RessourceTypeController(RessourceTypeService ressourceTypeService)
+        public RessourceTypeController(IRessourceTypeService ressourceTypeService, IErrorHandler errorHandler)
         {
             _ressourceTypeService = ressourceTypeService;
+            _errorHandler = errorHandler;
         }
 
 
         // GET: api/RessourceType
         [HttpGet]
-        public ActionResult<List<RessourceType>> Get() =>
-            _ressourceTypeService.Get();
+        public async Task<ActionResult<List<RessourceType>>> Get() {
+                var list = await _ressourceTypeService.Get();
+                return list;
+        }
+            
 
         // GET: api/RessourceType/5
         [HttpGet("{id:length(24)}", Name = "GetRessourceType")]
-        public ActionResult<RessourceType> Get(string id)
+        public async Task<ActionResult<RessourceType>> Get(string id)
         {
-            var ressourceType = _ressourceTypeService.Get(id);
+            var ressourceType = await _ressourceTypeService.Get(id);
 
             if (ressourceType == null)
             {
@@ -41,9 +50,9 @@ namespace test_mongo_auth.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<RessourceType>> GetRessourceTypeByType(int type)
+        public async  Task<ActionResult<List<RessourceType>>> GetRessourceTypeByType(int type)
         {
-            var ressourceTypes = _ressourceTypeService.Get(type);
+            var ressourceTypes = await _ressourceTypeService.GetByType(type);
 
             if (ressourceTypes == null)
             {
@@ -54,74 +63,78 @@ namespace test_mongo_auth.Controllers
         }
 
         // POST: api/RessourceType
-        //  [Authorize(Roles = "Admin")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public ActionResult<RessourceType> Create(RessourceType ressourceType)
+        public async Task<ActionResult<RessourceType>> Create(RessourceTypeViewModel ressourceTypeIn)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                 return BadRequest(new ValidationProblemDetails(ModelState));
+            var ressourceType = new RessourceType
             {
-                try
-                {
-                    _ressourceTypeService.Create(ressourceType);
-                }
-                catch (RessourceTypeDuplicateKeyException ex)
-                {
-                    ModelState.AddModelError("Name", ex.Message);
-                    return BadRequest(new ValidationProblemDetails(ModelState));
-                }
-                catch (Exception ex)
-                {
-                    var test = ex.GetType();
-                    return StatusCode(500, "Internal server error");
-                }
-
-                return CreatedAtRoute("GetRessourceType", new { id = ressourceType.Id.ToString() }, ressourceType);
+                Description = ressourceTypeIn.Description,
+                Name = ressourceTypeIn.Name,
+                Type = ressourceTypeIn.Type
+            };
+            try
+            {
+               await _ressourceTypeService.Create(ressourceType);
             }
-            return BadRequest(new ValidationProblemDetails(ModelState));
-
+            catch (RessourceTypeRepositoryException ex)
+            {
+                ModelState.AddModelError(ex.Field, ex.Message);
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+            return CreatedAtRoute("GetRessourceType", new { id = ressourceType.Id.ToString() }, ressourceType);
         }
 
         // PUT: api/RessourceType/5
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, RessourceTypeViewModel ressourceTypeIn)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(string id, RessourceTypeViewModel ressourceTypeIn)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            var ressourceTypeToUpdate = await _ressourceTypeService.Get(id);
+            if (ressourceTypeToUpdate == null)
+                return NotFound();
+            try
             {
-                var ressourceTypeToUpdate = _ressourceTypeService.Get(id);
-                if (ressourceTypeToUpdate == null)
-                    return NotFound();
-                try
-                {
-                    ressourceTypeToUpdate.Type = ressourceTypeIn.Type;
-                    ressourceTypeToUpdate.Name = ressourceTypeIn.Name;
-                    ressourceTypeToUpdate.Description = ressourceTypeIn.Description;
-                    _ressourceTypeService.Update(id, ressourceTypeToUpdate);
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, "Internal server error");
-                }
-
-                return CreatedAtRoute("GetRessourceType", new { id = ressourceTypeIn.Id.ToString() }, ressourceTypeIn);
+                ressourceTypeToUpdate.Type = ressourceTypeIn.Type;
+                ressourceTypeToUpdate.Name = ressourceTypeIn.Name;
+                ressourceTypeToUpdate.Description = ressourceTypeIn.Description;
+                await _ressourceTypeService.Update(ressourceTypeToUpdate);
             }
-            return BadRequest(new ValidationProblemDetails(ModelState));
+            catch (RessourceTypeRepositoryException ex)
+            {
+                ModelState.AddModelError(ex.Field, ex.Message);
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+            return CreatedAtRoute("GetRessourceType", new { id = ressourceTypeIn.Id.ToString() }, ressourceTypeIn);           
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(string id)
         {
-            var ressourceType = _ressourceTypeService.Get(id);
+            var ressourceType = await _ressourceTypeService.Get(id);
 
             if (ressourceType == null)
             {
                 return NotFound();
             }
 
-            _ressourceTypeService.Remove(ressourceType.Id);
+            await _ressourceTypeService.Remove(ressourceType.Id);
 
-            return NoContent();
+            return Ok();
         }
     }
 }

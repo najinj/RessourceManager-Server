@@ -2,11 +2,61 @@
 using RessourceManager.Core.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
+using System.Threading.Tasks;
+using ServiceStack;
+using MongoDB.Bson;
+using RessourceManager.Infrastructure.Context;
 
 namespace RessourceManager.Core.Repositories
 {
+    public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    {
+        protected readonly IMongoContext _context;
+        protected readonly IMongoCollection<TEntity> DbSet;
+
+        protected Repository(IMongoContext context)
+        {
+            _context = context;
+            DbSet = _context.GetCollection<TEntity>(typeof(TEntity).Name);
+        }
+
+        public async virtual Task Add(TEntity obj)
+        {                  
+            _context.AddCommand(() => DbSet.InsertOneAsync(obj));
+            var result = await _context.SaveChanges();                               
+        }
+
+        public virtual async Task<TEntity> GetById(string id)
+        {
+            var data = await DbSet.FindAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(id)));
+            return data.FirstOrDefault();
+        }
+
+        public virtual async Task<IEnumerable<TEntity>> GetAll()
+        {
+            var all = await DbSet.FindAsync(entity => true);
+            return all.ToList();
+        }
+
+        public virtual async Task Update(TEntity obj)
+        {
+            _context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(obj.GetId().ToString())), obj));
+            var result = await _context.SaveChanges();
+        }
+
+        public virtual async Task Remove(string id)
+        {
+            _context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", ObjectId.Parse(id))));
+            var result = await _context.SaveChanges();
+        } 
+
+        public void Dispose()
+        {
+            _context?.Dispose();
+        }
+    }
+
+
     /*
     public class Repository<TDocument> : IRepository<TDocument> where TDocument : class
     {

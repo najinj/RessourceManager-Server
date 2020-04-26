@@ -2,22 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.Services.Interfaces;
 using RessourceManager.Core.ViewModels.Authentication;
-using RessourceManagerApi.Services;
 
 namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class UserController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly EmailSenderService _emailService;
-        public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, EmailSenderService emailService)
+        private readonly IEmailSenderService _emailService;
+        public UserController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IEmailSenderService emailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -49,7 +51,7 @@ namespace RessourceManagerApi.Controllers
                 {
                     try
                     {
-                        await _emailService.SendEmailAsync(email, "Your Account Has Been Activated");
+                        await _emailService.SendActivationEmailAsync(email);
                     }
 
                     catch (Exception ex)

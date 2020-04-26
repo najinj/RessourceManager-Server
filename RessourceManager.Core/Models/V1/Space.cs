@@ -18,6 +18,7 @@ namespace RessourceManager.Core.Models.V1
         [StringLength(24, MinimumLength = 24, ErrorMessage = "Not a valid RessourceTypeId")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string SpaceTypeId { get; set; }
+        public string SpaceTypeName { get; set; }
 
         [Required(ErrorMessage = "Name is Required")]
         public string Name { get; set; }

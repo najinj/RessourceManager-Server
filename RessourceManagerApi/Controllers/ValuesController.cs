@@ -1,20 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
-namespace test_mongo_auth.Controllers
+using Microsoft.AspNetCore.Mvc;
+using RessourceManager.Core.Models.V1;
+using RessourceManager.Core.Services.Interfaces;
+using RessourceManager.Infrastructure.Context;
+
+namespace RessourceManagerApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly IMongoContext _mongo;
+        private readonly IReservationService _reservationService;
+
+        public ValuesController(IMongoContext context, IReservationService reservationService)
+        {
+            _mongo = context;
+            _reservationService = reservationService;
+        }
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            
             return new string[] { "value1", "value2" };
         }
 
@@ -27,8 +37,12 @@ namespace test_mongo_auth.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody] Reservation reservation)
         {
+            if (ModelState.IsValid)
+            {
+                _reservationService.Add(reservation);
+            }
         }
 
         // PUT api/values/5

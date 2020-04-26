@@ -10,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace test_mongo_auth.Helpers
+namespace RessourceManagerApi.Helpers
 {
     public static class AuthenticationHelper
     {
