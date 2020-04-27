@@ -27,6 +27,7 @@ This Version is built using .NET Core, MongoDB, and React for the client-side.
 #### Features available to a normal user :  
 - :heavy_check_mark: As a user, I can search :mag: for available resources using a set of criteria.
 - :heavy_check_mark: As a user, I  can book available resources.
+- :heavy_check_mark: As a user, I  can book available resources periodiclly (eg: on Mondays,Wensdays starting 01/01/2020 to 01/03/2020 from 10:00 to 13:00).
 - :heavy_check_mark: As a user, I  can view my reservations.
 - :heavy_check_mark: As a user, I  cancel my reservations.
 - :heavy_check_mark: As a user, I  can filter my reservations (based on resource name, resource type, date, or time).
