@@ -12,10 +12,10 @@ using RessourceManager.Core.Models.V1;
 using RessourceManager.Api.Infrastructure.Middlewares;
 using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using AspNetCore.Identity.MongoDbCore.Extensions;
-using RessourceManager.Infrastructure.DatabaseSettings;
 using RessourceManagerApi.ExtensionMethods;
 using Microsoft.OpenApi.Models;
-
+using RessourceManagerApi.Infrastructure;
+using RessourceManager.Infrastructure.DatabaseSettings;
 
 namespace RessourceManagerApi
 {
@@ -45,14 +45,14 @@ namespace RessourceManagerApi
                 options.SuppressUseValidationProblemDetailsForInvalidModelStateResponses = false;
             });
 
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); 
             
-            RessourceManagerApi.Infrastructure.Installer.ConfigureServices(services);
-            RessourceManager.Infrastructure.Installer.RegisterServices(services, Configuration);
-            // RegisterServices(services);
-            ConfigureDbIdentity(services);
+            Installer.ConfigureServices(services, Configuration);
+
+            Installer.ConfigureMongoDbIdentity(services);
 
             services.AddMvc();
+
             RegisterAuth(services);
 
             services.AddSwaggerGen(c =>
@@ -75,77 +75,29 @@ namespace RessourceManagerApi
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseCors("MyPolicy");
+
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+
             ConfigureAuth(app);
-            app.UseHttpsRedirection();           
+
+            app.UseHttpsRedirection();     
+            
             app.UseTokenProvider(_tokenProviderOptions);
-            app.UseAuthentication();          
+
+            app.UseAuthentication();       
+            
             app.UseMvc();
-            // CreateUserRoles(services).Wait();
+
+            Installer.CreateUserRoles(serviceProvider).Wait();
+
             app.UseSwagger();
+
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "ResourceManager API v1");
-                //c.RoutePrefix = string.Empty;
             });
-
-        }
-
-
-
-        private async Task CreateUserRoles(IServiceProvider serviceProvider)
-        {
-            var RoleManager = serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-            var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
-            IdentityResult roleResult;
-            //Adding Admin Role
-            var roleCheck = await RoleManager.RoleExistsAsync("Admin");
-            if (!roleCheck)
-            {
-                //create the roles and seed them to the database
-                roleResult = await RoleManager.CreateAsync(new ApplicationRole("Admin"));
-            }
-            //Assign Admin role to the main User here we have given our newly registered 
-            //login id for Admin management
-            ApplicationUser user = await UserManager.FindByEmailAsync("naji.ensat@gmailcom");
-            if(user != null)
-                 await UserManager.AddToRoleAsync(user, "Admin");
-        }
-
-        private void ConfigureDbIdentity(IServiceCollection services)
-        {
-            var serviceProvider = services.BuildServiceProvider();
-            var ressourceDatabaseSettingsService = serviceProvider.GetService<IRessourceDatabaseSettings>();
-                   
-            var mongoDbIdentityConfiguration = new MongoDbIdentityConfiguration
-            {
-                MongoDbSettings = new MongoDbSettings
-                {
-                    ConnectionString = ressourceDatabaseSettingsService.ConnectionString,
-                    DatabaseName = ressourceDatabaseSettingsService.DatabaseName
-                },
-                IdentityOptionsAction = options =>
-                {
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequireLowercase = true;
-                    options.Password.RequireUppercase = true;
-                    options.Password.RequireNonAlphanumeric = true;
-                    options.Password.RequireDigit = true;
-
-                    // Lockout settings
-                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                    options.Lockout.MaxFailedAccessAttempts = 10;
-
-                    // ApplicationUser settings
-                    options.User.RequireUniqueEmail = true;
-                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@.-_";
-                }
-            };
-
-            services.ConfigureMongoDbIdentity<ApplicationUser, ApplicationRole, Guid>(mongoDbIdentityConfiguration);
-
-        }
+        }       
     }
 }
