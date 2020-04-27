@@ -70,6 +70,7 @@ namespace RessourceManagerApi.Controllers
             return reservations.OrderByDescending(reservation => reservation.Start).ToList(); ;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<ActionResult<dynamic>> Availability(AvailabilityViewModel reservationIn)
         {
             if(!ModelState.IsValid)
