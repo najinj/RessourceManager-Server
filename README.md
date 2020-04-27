@@ -11,7 +11,7 @@ So you can call it a remaster version :sparkles: if you like, it still needs som
 you can find it here.
 
 This Version is built using .NET Core, MongoDB, and React for the client-side.
-
+You can find the front-end project for this application [here](https://github.com/najinj/RessourceManager-Client).
 
 ## Tech/frameworks used (only for the back-end)
 - [.NET Core](https://www.microsoft.com/net/core)
@@ -63,7 +63,6 @@ An admin has access to three main application settings
 1. Install MongoDB v4.2
 2. Install [.NET Core 2.2 SDK](https://dotnet.microsoft.com/download/dotnet-core/2.2)
 3. Clone the project and run it
-
 
 ## License
 
