@@ -90,7 +90,7 @@ namespace RessourceManagerApi
             
             app.UseMvc();
 
-            Installer.CreateUserRoles(serviceProvider).Wait();
+            Installer.CreateUsersAndRoles(serviceProvider).Wait();
 
             app.UseSwagger();
 
