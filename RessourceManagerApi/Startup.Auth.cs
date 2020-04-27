@@ -94,9 +94,12 @@ namespace RessourceManagerApi
                 var user = await userManager.FindByEmailAsync(username);
                 var result = userManager.CheckPasswordAsync(user, password).Result;
 
-                if (result && user.Activated)
+                if (result)
                 {
                     var userRoles = await userManager.GetRolesAsync(user);
+                    if(!user.Activated && !userRoles.Contains("Admin"))
+                        return (null, (int)LoginResult.NotActivated);
+
                     var claims = new List<Claim>
                     {
                         new Claim(JwtRegisteredClaimNames.Email, user.Email),
@@ -113,15 +116,9 @@ namespace RessourceManagerApi
                     }
 
                     return (new ClaimsIdentity(new GenericIdentity(username, "Token"), claims), (int)LoginResult.Success);
-                    
-                }
-                else if (result && !user.Activated)
-                {
-                    return (null, (int)LoginResult.NotActivated);
                 }
                 else
                     return (null, (int)LoginResult.WrongCredentials);
-             
             }
         }
     }
