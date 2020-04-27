@@ -14,6 +14,8 @@ using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using AspNetCore.Identity.MongoDbCore.Extensions;
 using RessourceManager.Infrastructure.DatabaseSettings;
 using RessourceManagerApi.ExtensionMethods;
+using Microsoft.OpenApi.Models;
+
 
 namespace RessourceManagerApi
 {
@@ -53,12 +55,17 @@ namespace RessourceManagerApi
             services.AddMvc();
             RegisterAuth(services);
 
-
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,IServiceProvider serviceProvider)
         {
+            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -75,7 +82,14 @@ namespace RessourceManagerApi
             app.UseTokenProvider(_tokenProviderOptions);
             app.UseAuthentication();          
             app.UseMvc();
-           // CreateUserRoles(services).Wait();
+            // CreateUserRoles(services).Wait();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ResourceManager API v1");
+                //c.RoutePrefix = string.Empty;
+            });
+
         }
 
 
