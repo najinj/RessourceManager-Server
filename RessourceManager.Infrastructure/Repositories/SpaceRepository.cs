@@ -4,7 +4,7 @@ using RessourceManager.Infrastructure.Context;
 using RessourceManager.Infrastructure.Repositories;
 
 
-namespace RessourceManager.Core.Repositories
+namespace RessourceManager.Infrastructure.Repositories
 {
     public class SpaceRepository : Repository<Space> , ISpaceRepository
     {
