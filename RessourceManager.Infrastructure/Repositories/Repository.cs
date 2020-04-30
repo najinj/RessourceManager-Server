@@ -1,13 +1,12 @@
 ﻿using MongoDB.Driver;
 using RessourceManager.Core.Repositories.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ServiceStack;
 using MongoDB.Bson;
 using RessourceManager.Infrastructure.Context;
 
-namespace RessourceManager.Core.Repositories
+namespace RessourceManager.Infrastructure.Repositories
 {
     public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {

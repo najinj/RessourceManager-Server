@@ -7,7 +7,7 @@ using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Infrastructure.Context;
 using System.Linq;
 
-namespace RessourceManager.Core.Repositories
+namespace RessourceManager.Infrastructure.Repositories
 {
     public class ReservationRepository : Repository<Reservation>, IReservationRepository
     {
