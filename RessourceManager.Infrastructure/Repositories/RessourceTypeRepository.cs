@@ -5,7 +5,7 @@ using RessourceManager.Infrastructure.Context;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace RessourceManager.Core.Repositories
+namespace RessourceManager.Infrastructure.Repositories
 {
     public class RessourceTypeRepository : Repository<RessourceType> , IRessourceTypeRepository
     {

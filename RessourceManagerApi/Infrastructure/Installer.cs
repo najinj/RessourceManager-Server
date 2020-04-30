@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using AspNetCore.Identity.MongoDbCore.Extensions;
 using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RessourceManager.Core.Helpers;
 using RessourceManager.Core.Models.V1;
-using RessourceManager.Core.Repositories;
+using RessourceManager.Infrastructure.Repositories;
 using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Core.Services;
 using RessourceManager.Core.Services.Interfaces;

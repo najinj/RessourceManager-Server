@@ -2,7 +2,7 @@
 using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Infrastructure.Context;
 
-namespace RessourceManager.Core.Repositories
+namespace RessourceManager.Infrastructure.Repositories
 {
     public class BackOfficeSettingsRepository : Repository<BackOfficeSettings>, IBackOfficeSettingsRepository
     {

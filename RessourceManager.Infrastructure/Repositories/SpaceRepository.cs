@@ -1,11 +1,10 @@
 ﻿using RessourceManager.Core.Models.V1;
 using RessourceManager.Core.Repositories.Interfaces;
 using RessourceManager.Infrastructure.Context;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using RessourceManager.Infrastructure.Repositories;
 
-namespace RessourceManager.Core.Repositories
+
+namespace RessourceManager.Infrastructure.Repositories
 {
     public class SpaceRepository : Repository<Space> , ISpaceRepository
     {

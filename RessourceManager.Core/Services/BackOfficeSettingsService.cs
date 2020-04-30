@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using RessourceManager.Core.Models.V1;
-using RessourceManager.Core.Repositories;
 using RessourceManager.Core.Repositories.Interfaces;
 
 
